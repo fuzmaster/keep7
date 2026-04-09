@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Keep7 – Deck Consistency Lab</title>
+  <meta name="description" content="Test opening hands, goldfish early turns, and compare decks. A fast MTG deck consistency lab.">
+  <meta property="og:title" content="Keep7 – Deck Consistency Lab">
+  <meta property="og:description" content="Opening hand tester, goldfish mode, and deck race. Free, fast, client-side.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#07090f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header" role="banner">
+      <div class="logo" aria-label="Keep7">Keep<span>7</span></div>
+      <nav class="mode-nav" role="tablist" aria-label="App modes">
+        <button class="mode-tab mode-tab--active" data-mode="handtest"
+                role="tab" aria-selected="true" type="button">Hand Test</button>
+        <button class="mode-tab" data-mode="goldfish"
+                role="tab" aria-selected="false" type="button">Goldfish</button>
+        <button class="mode-tab" data-mode="race"
+                role="tab" aria-selected="false" type="button">Deck Race</button>
+      </nav>
+      <div id="header-right" class="header-right"></div>
+    </header>
+    <div id="mode-handtest" class="mode-panel" role="tabpanel">
+      <section id="input-section" class="input-section">
+        <h1 class="hero-headline">Deck Consistency Lab</h1>
+        <p class="hero-sub">Test opening hands. Measure reliability.</p>
+        <label for="decklist-input" class="sr-only">Paste your decklist</label>
+        <textarea id="decklist-input" class="decklist-input"
+          placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Lightning Bolt&#10;35 Plains&#10;..."
+          aria-label="Decklist input"></textarea>
+        <div class="input-actions">
+          <button id="btn-sample" class="btn-sample" type="button">Sample deck</button>
+          <label for="web-deck-type" class="sr-only">Web deck type</label>
+          <select id="web-deck-type" class="input-select" aria-label="Web deck type filter">
+            <option value="Commander Deck" selected>Commander</option>
+            <option value="Duel Deck">Duel</option>
+            <option value="Event Deck">Event</option>
+            <option value="Theme Deck">Theme</option>
+            <option value="__any__">Any Type</option>
+          </select>
+          <button id="btn-web-sample" class="btn-sample" type="button">Random Web Deck</button>
+          <button id="btn-start"  class="btn-start"  type="button">Test Opening Hand</button>
+        </div>
+        <div id="saved-hint" class="saved-hint hidden"></div>
+      </section>
+      <section id="test-section" class="test-section hidden" aria-label="Hand testing">
+        <div class="test-header">
+          <span class="section-label" id="hand-label" tabindex="-1">Opening Hand</span>
+          <div id="hand-eval" class="hand-eval"></div>
+        </div>
+        <div id="hand-container" class="card-grid"
+             role="region" aria-live="polite" aria-label="Opening hand"></div>
+        <div id="draws-area" class="hidden">
+          <div class="draws-divider"><span>Next 3 draws</span></div>
+          <div id="draws-container" class="card-grid card-grid--draws"
+               role="region" aria-live="polite" aria-label="Next draws"></div>
+        </div>
+        <div id="stats-panel" class="stats-panel" aria-live="polite"></div>
+        <div id="validation-banner" class="validation-banner hidden"></div>
+      </section>
+      <div id="action-bar" class="action-bar hidden" role="toolbar" aria-label="Hand actions">
+        <button id="btn-mull"  class="btn btn-mull"         type="button" aria-label="Mulligan">Mulligan</button>
+        <button id="btn-keep"  class="btn btn-keep"         type="button" aria-label="Keep hand">Keep</button>
+        <button id="btn-reset" class="btn btn-new hidden"   type="button" aria-label="New hand">New Hand</button>
+      </div>
+    </div><!-- /mode-handtest -->
+    <div id="mode-goldfish" class="mode-panel hidden" role="tabpanel">
+      <div id="gf-idle">
+        <div class="mode-idle">
+          <p class="idle-message">Load a deck in <strong>Hand Test</strong> first, then come back to step through turns 1–5.</p>
+          <button class="btn-ghost" id="btn-gf-go-load" type="button">← Go to Hand Test</button>
+        </div>
+      </div>
+      <div id="gf-active" class="hidden">
+        <div class="goldfish-header">
+          <div class="turn-block">
+            <span class="turn-label">Turn</span>
+            <span id="gf-turn" class="turn-num">1</span>
+            <span class="turn-of">/ 5</span>
+          </div>
+          <div class="mana-block">
+            <span class="mana-label">Mana</span>
+            <span id="gf-mana" class="mana-num">0</span>
+          </div>
+          <div id="gf-summary" class="gf-summary"></div>
+        </div>
+        <div class="gf-zones">
+          <div class="gf-zone">
+            <div class="zone-label">
+              Hand <span id="gf-hand-count" class="zone-count"></span>
+            </div>
+            <div id="gf-hand" class="card-grid card-grid--sm"
+                 role="region" aria-label="Cards in hand"></div>
+          </div>
+          <div class="gf-zone">
+            <div class="zone-label">Battlefield — Lands</div>
+            <div id="gf-battlefield" class="card-grid card-grid--sm"
+                 role="region" aria-label="Lands in play"></div>
+          </div>
+        </div>
+        <div class="goldfish-actions">
+          <button id="btn-gf-next"  class="btn-primary" type="button">→ Turn 2</button>
+          <button id="btn-gf-reset" class="btn-ghost"   type="button">Reset</button>
+        </div>
+      </div>
+    </div><!-- /mode-goldfish -->
+    <div id="mode-race" class="mode-panel hidden" role="tabpanel">
+      <div id="race-input">
+        <div class="race-decks">
+          <div class="race-deck-col">
+            <label class="race-deck-label" for="race-deck-a">Deck A</label>
+            <textarea id="race-deck-a" class="decklist-input decklist-input--compact"
+              placeholder="1 Sol Ring&#10;35 Plains&#10;..." aria-label="Deck A decklist"></textarea>
+          </div>
+          <div class="race-deck-col">
+            <label class="race-deck-label" for="race-deck-b">Deck B</label>
+            <textarea id="race-deck-b" class="decklist-input decklist-input--compact"
+              placeholder="1 Sol Ring&#10;35 Islands&#10;..." aria-label="Deck B decklist"></textarea>
+          </div>
+        </div>
+        <div class="race-input-actions">
+          <button id="btn-race-compare" class="btn-primary" type="button">Compare Decks</button>
+        </div>
+        <div id="race-status" class="race-status hidden"></div>
+      </div>
+      <div id="race-results" class="race-results hidden">
+        <div class="race-hands">
+          <div class="race-hand-col">
+            <div class="race-hand-label">Deck A — Opening Hand</div>
+            <div id="race-hand-a" class="card-grid card-grid--race"
+                 role="region" aria-label="Deck A opening hand"></div>
+          </div>
+          <div class="race-hand-col">
+            <div class="race-hand-label">Deck B — Opening Hand</div>
+            <div id="race-hand-b" class="card-grid card-grid--race"
+                 role="region" aria-label="Deck B opening hand"></div>
+          </div>
+        </div>
+        <div class="race-stats-grid">
+          <div class="race-stats-col">
+            <div class="race-stats-head">Deck A — 20-hand stats</div>
+            <div id="race-stats-a" class="race-stats"></div>
+          </div>
+          <div class="race-stats-col">
+            <div class="race-stats-head">Deck B — 20-hand stats</div>
+            <div id="race-stats-b" class="race-stats"></div>
+          </div>
+        </div>
+        <div id="race-verdict" class="race-verdict"></div>
+        <div class="race-result-actions">
+          <button id="btn-race-new-hands" class="btn-ghost" type="button">New Hands</button>
+          <button id="btn-race-reset"     class="btn-ghost" type="button">New Decks</button>
+        </div>
+      </div>
+    </div><!-- /mode-race -->
+  </div>
+
+  <div id="zoom-modal" class="hidden" role="dialog" aria-modal="true" aria-label="Card zoom"></div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
