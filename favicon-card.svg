@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .card-bg { fill: #e9ecf5; }
+      .card-border { stroke: #07090f; stroke-width: 2; }
+      .card-number { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 56px; fill: #e8b836; }
+    </style>
+  </defs>
+  <rect x="20" y="15" width="60" height="70" rx="4" class="card-bg card-border"/>
+  <text x="50" y="65" text-anchor="middle" class="card-number">7</text>
+</svg>
