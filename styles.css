@@ -71,6 +71,28 @@ body {
   padding: 0 14px calc(76px + var(--safe-b));
 }
 
+.app-footer {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 14px calc(14px + var(--safe-b));
+  text-align: center;
+}
+
+.app-footer-link {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  opacity: 0.9;
+}
+
+.app-footer-link:hover,
+.app-footer-link:focus-visible {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
 .app-header {
   display: flex;
   align-items: center;
@@ -718,6 +740,7 @@ body {
 
 @media (min-width: 640px) {
   #app { max-width: 900px; padding: 0 28px calc(28px + var(--safe-b)); }
+  .app-footer { max-width: 900px; padding: 2px 28px 20px; }
   .app-header { padding: 20px 0 14px; margin-bottom: 20px; }
   .hero-headline { font-size: 1.7rem; }
   .hero-sub { font-size: 0.95rem; }
@@ -748,6 +771,7 @@ body {
 
 @media (min-width: 1024px) {
   #app { max-width: 1020px; padding: 0 40px 40px; }
+  .app-footer { max-width: 1020px; padding: 0 40px 22px; }
   .card-grid { gap: 10px; }
   .zoom-overlay img { max-width: 380px; }
 }
