@@ -293,6 +293,34 @@ body {
   text-underline-offset: 2px;
 }
 
+.roadmap-section {
+  margin-top: 32px;
+  border-top: 1px solid var(--border-faint);
+  padding-top: 20px;
+}
+
+.roadmap-section h3 {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.roadmap-section p,
+.roadmap-section li {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.roadmap-section ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
 .test-section { display: flex; flex-direction: column; gap: 4px; }
 
 .test-header {
