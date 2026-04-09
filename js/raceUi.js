@@ -5,13 +5,9 @@ import { saveCardCacheByHash, loadCardCacheByHash } from './storage.js';
 import { deckHash }          from './hash.js';
 import { runDeckTrials, generateVerdict } from './race.js';
 import { openZoom }          from './zoom.js';
+import { appendCardSlot }    from './domUtils.js';
 
 const byId = id => document.getElementById(id);
-
-function getImageUrl(card, size) {
-  const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
-  return uris ? uris[size] || uris.small || uris.normal || null : null;
-}
 
 export function createRaceApp() {
   const inputEl      = byId('race-input');
@@ -60,24 +56,16 @@ export function createRaceApp() {
     if (!container) return;
     container.innerHTML = '';
     cards.forEach((card, i) => {
-      const slot = document.createElement('div');
-      slot.className = 'card-slot card-slot--race fade-in';
-      slot.style.animationDelay = `${i * 35}ms`;
-      slot.setAttribute('role', 'button');
-      slot.setAttribute('aria-label', `View ${card.name}`);
-      slot.addEventListener('click', () => openZoom(card));
-
-      const src = getImageUrl(card, 'small');
-      if (src) {
-        const img = document.createElement('img');
-        img.src = src; img.alt = card.name; img.width = 146; img.height = 204;
-        slot.appendChild(img);
-      } else {
-        const ph = document.createElement('div');
-        ph.className = 'card-placeholder'; ph.textContent = card.name;
-        slot.appendChild(ph);
-      }
-      container.appendChild(slot);
+      appendCardSlot(container, card, {
+        index: i,
+        delayMs: 35,
+        baseClass: 'card-slot card-slot--race fade-in',
+        role: 'button',
+        tabIndex: 0,
+        ariaLabel: `View ${card.name}`,
+        onClick: () => openZoom(card),
+        imageSize: 'small',
+      });
     });
   }
 

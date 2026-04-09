@@ -1,12 +1,8 @@
 import { createGoldfishState, playLand, advanceTurn, goldfishSummary, getCastableFlags } from './goldfish.js';
 import { isLand } from './metrics.js';
+import { appendCardSlot } from './domUtils.js';
 
 const byId = id => document.getElementById(id);
-
-function getImageUrl(card, size) {
-  const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
-  return uris ? uris[size] || uris.small || uris.normal || null : null;
-}
 
 export function createGoldfishApp({ getDeck }) {
   let gfState = null;
@@ -73,32 +69,18 @@ export function createGoldfishApp({ getDeck }) {
       const isCastable = castableFlags[i];
       const canPlay   = land && interactive && !gfState.landPlayedThisTurn;
 
-      const slot = document.createElement('div');
-      slot.className = 'card-slot card-slot--sm fade-in';
-      slot.style.animationDelay = `${i * 25}ms`;
-      slot.setAttribute('aria-label', card.name);
-
-      if (canPlay) {
-        slot.classList.add('card-land-highlight');
-        slot.setAttribute('role', 'button');
-        slot.title = 'Play this as your land drop';
-        slot.addEventListener('click', () => { gfState = playLand(gfState, i); render(); });
-      } else if (isCastable) {
-        slot.classList.add('card-castable-glow');
-      }
-
-      const src = getImageUrl(card, 'small');
-      if (src) {
-        const img = document.createElement('img');
-        img.src = src; img.alt = card.name; img.width = 146; img.height = 204;
-        slot.appendChild(img);
-      } else {
-        const ph = document.createElement('div');
-        ph.className = 'card-placeholder'; ph.textContent = card.name;
-        slot.appendChild(ph);
-      }
-
-      container.appendChild(slot);
+      appendCardSlot(container, card, {
+        index: i,
+        delayMs: 25,
+        baseClass: 'card-slot card-slot--sm fade-in',
+        extraClasses: [canPlay ? 'card-land-highlight' : '', isCastable ? 'card-castable-glow' : ''],
+        role: canPlay ? 'button' : null,
+        tabIndex: canPlay ? 0 : null,
+        title: canPlay ? 'Play this as your land drop' : undefined,
+        ariaLabel: card.name,
+        onClick: canPlay ? () => { gfState = playLand(gfState, i); render(); } : undefined,
+        imageSize: 'small',
+      });
     });
   }
 
