@@ -1,102 +1,115 @@
 # Keep7
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![ES Modules](https://img.shields.io/badge/Module%20System-ES%20Modules-brightgreen)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
-[![Client-Side Only](https://img.shields.io/badge/Backend-None-blue)]()
-[![MTG Focused](https://img.shields.io/badge/For-MTG%20Players-ff0000)](https://magic.wizards.com/)
+Testing a 100-card Magic deck on a phone is a pain.
 
-A fast, client-side MTG deck consistency lab.
+Most tools feel cramped, slow, or built for desktop first. Keep7 fixes that.
 
-Keep7 helps you test opening hands, goldfish early turns, compare two decklists, and load random sample decks from the web.
+Paste your list. Tap through opening hands. Goldfish turns. Compare two decks. Do it fast on mobile.
 
-## Quick Start
+## 60-Second Recruiter Scan
 
-```bash
-# With Python 3
-python -m http.server 5173
+**What it is:**
+Mobile-first MTG deck testing app for opening-hand consistency and early-turn simulation.
 
-# Or Node.js (if you have http-server installed)
-npx http-server -p 5173
-```
+**Problem solved:**
+Commander deck testing on a phone is usually slow and clumsy.
 
-Then open `http://localhost:5173` in your browser.
+**What I built:**
+- Hand tester with keep/mull flow and draw reveal
+- Turn 1-5 goldfish simulator
+- Deck-vs-deck race mode with 20-hand trial verdicts
+- Web deck loader (MTGJSON) with retries and fallback behavior
+- Parser cleanup for noisy Moxfield export lines
+- Full-screen tap-to-zoom card modal for mobile use
 
-## Demo
+**Stack:**
+Vanilla JS (ES modules), HTML, CSS, Scryfall API, MTGJSON API
 
-**Hand Test Mode:** Draw opening hands, evaluate keep quality, reveal next draws, track session stats.
+**Why this matters:**
+Shows product thinking, practical front-end architecture, API resilience, and mobile UX execution in one project.
 
-**Goldfish Mode:** Simulate turns 1–5 with land-play interactions and castable card highlights.
+## What This App Does
 
-**Deck Race Mode:** Compare two decks side-by-side across 20 simulated openers and get a verdict.
+Keep7 is a client-side MTG deck testing app focused on Commander-sized lists.
 
-**Random Web Deck:** Load a random MTG precon from MTGJSON, with type filtering and intelligent fallback.
+It helps you answer real play questions:
+
+- Is this opener keepable?
+- How often do I hit land drops?
+- Which version of this deck starts better?
+
+## Why People Use Keep7
+
+- **You can test in seconds, not minutes.**
+  Paste a decklist and start drawing hands right away.
+
+- **It works well on a phone.**
+  Big tap targets, quick flows, full-screen card zoom.
+
+- **You can compare deck versions side by side.**
+  Run 20 opener trials for each list and read a plain verdict.
+
+- **You can load random web decks for fun testing.**
+  Pull from MTGJSON by deck type, then tap "Try another."
+
+- **It keeps your choices.**
+  Deck text, web deck type, and card cache are saved in local storage.
 
 ## Features
 
-- Hand Test mode
-  - Parse decklists from plain text (`count card name` per line)
-  - Draw opening hands and evaluate keep/mull quality
-  - Reveal next 3 draws
-  - Session stats (keep rate, opener land distribution, etc.)
-- Goldfish mode
-  - Simulate turns 1-5 with land-play interactions
-  - Castable card highlighting and quick summary
-- Deck Race mode
-  - Compare two decks over 20 simulated openers each
-  - Side-by-side opening hands, metrics, and verdict summary
-- Random Web Deck mode (MTGJSON)
-  - Load a random deck by selected deck type
-  - Fallback flow: selected type -> any type -> local sample deck
-  - Source link and quick "Try another" action
-  - Type filter persistence in local storage
+### Test Opening Hands
 
-## Tech Stack
+- Parse decklists from plain text
+- Draw a 7-card opener
+- Mulligan or keep
+- Reveal the next 3 draws
+- Track session stats (keep rate, land distribution, flood/screw signals)
 
-- Vanilla HTML/CSS/JavaScript (ES modules)
-- Scryfall API for card image/data fetch
-- MTGJSON API for remote sample deck loading
-- No backend required
+### Goldfish Turns 1-5
 
-## Project Structure
+- Simulate early turns with your actual list
+- Play lands from hand
+- See available mana and castable cards
 
-- `index.html` - main app shell and mode panels
-- `styles.css` - app styling and responsive layout
-- `js/main.js` - app initialization and mode tab switching
-- `js/ui.js` - Hand Test UI flow
-- `js/goldfishUi.js` - Goldfish UI
-- `js/raceUi.js` - Deck Race UI
-- `js/remoteDeck.js` - MTGJSON random deck loader
-- `js/storage.js` - local storage cache/persistence helpers
-- `js/parser.js`, `js/engine.js`, `js/metrics.js`, etc. - core logic
+### Compare Two Decks
 
-## Getting Started
+- Run 20 opener simulations for Deck A and Deck B
+- See both opening hands
+- Review core stats for each deck
+- Get a short verdict line you can act on
 
-### Prerequisites
+### Load Random Web Decks
 
-- Modern browser with ES module support (Chrome 61+, Firefox 67+, Safari 11+, Edge 79+)
-- A local web server (see below)
-- Internet connection (for Scryfall card images and MTGJSON deck catalog)
+- Load random decks from MTGJSON
+- Filter by deck type
+- Fallback flow: selected type -> any type -> local sample deck
+- One-tap "Try another"
 
-### Setup
+## Setup (Low Pressure)
 
-Clone or download this repo, then from the root directory, start a static server:
+No account. No backend setup. No database.
 
-**Python 3:**
+1. Clone this repo.
+2. Start a local static server.
+3. Open the app in your browser.
+
+### Option A: Python
+
 ```bash
 python -m http.server 5173
 ```
 
-**Node.js:**
+### Option B: Node
+
 ```bash
 npx http-server -p 5173
 ```
 
-**Live Server (VS Code extension):**
-- Right-click `index.html` → "Open with Live Server"
+Then open:
 
-Then visit `http://localhost:5173`.
+`http://localhost:5173`
 
-## Decklist Format
+## Decklist Input Format
 
 Use one card per line:
 
@@ -106,78 +119,49 @@ Use one card per line:
 35 Plains
 ```
 
-Notes:
+The parser handles common export noise, including set codes and collector numbers from Moxfield-style lines.
 
-- Prefix each line with a count.
-- Unrecognized lines are skipped and reported in validation.
+## Tech and APIs
 
-## Web Deck Loading Details
+- Vanilla HTML/CSS/JavaScript (ES modules)
+- Scryfall API for card data and images
+- MTGJSON API for random web deck loading
+- Fully client-side (no custom backend)
 
-The `Random Web Deck` button uses MTGJSON v5:
+## Project Layout
 
-1. Fetches `DeckList.json` (cached in memory).
-2. Filters by selected deck type (or any type).
-3. Picks a random recent candidate.
-4. Fetches `/api/v5/decks/{fileName}.json`.
-5. Normalizes sections into decklist lines for the textarea.
+- `index.html` - app shell and mode panels
+- `styles.css` - visual system and responsive layout
+- `js/ui.js` - hand test flow and interactions
+- `js/goldfishUi.js` - goldfish mode UI
+- `js/raceUi.js` - deck race mode UI
+- `js/remoteDeck.js` - MTGJSON deck loading logic
+- `js/parser.js` - decklist parsing and cleanup
+- `js/storage.js` - local cache and saved settings
 
-Resilience:
+## Common Issues
 
-- Request timeout + retry
-- Fallback to any deck type if selected type has no available candidates
-- Final fallback to built-in local sample deck
+### App does not load modules
 
-## Persistence and Cache
+Run from a local server, not `file://`.
 
-Stored in `localStorage`:
+### Card images do not appear
 
-- Last decklist text
-- Selected web deck type
-- Card cache (hash-keyed, TTL-based, bounded deck count)
+Check internet access and Scryfall availability.
 
-Use the `Clear` action in the UI hint area to clear saved decklist/cache data.
+### Random web deck fails
 
-## Notes
+MTGJSON may be down. Keep7 falls back to a local sample deck.
 
-- Keep7 is fully client-side; no user-authored deck content is sent to your own server.
-- Third-party API availability (Scryfall/MTGJSON) affects remote loading behavior.
+## Portfolio Note
 
-## Troubleshooting
+This project shows product thinking plus front-end execution:
 
-**"Module not found" or CORS errors:**
-- Ensure you're running via a web server, not `file://`
-- Check browser console for detailed errors
-
-**Card images not loading:**
-- Verify internet connection
-- Check if Scryfall API is accessible
-
-**Random Web Deck fails:**
-- MTGJSON may be temporarily unavailable; app falls back to local sample
-- Check network tab in DevTools for API response codes
-
-**Local storage clearing:**
-- Use the "Clear" button in the saved-hint area to reset cache/decklist
-- Or clear browser localStorage manually (DevTools → Application → Local Storage)
-
-## Contributing
-
-Contributions welcome! Fork, make changes, and open a pull request.
-
-Ideas:
-- Additional deck filtering/sorting options
-- Custom mulligan rules
-- Matchup analysis tools
-- Mobile UI improvements
-
-## Roadmap Ideas
-
-- More deck type presets and custom filters
-- Better sampling controls (era/set windows)
-- Extra mulligan heuristics and matchup overlays
-- Export/share test snapshots
-- Elo-weighted deck comparison
+- Mobile-first UX for a niche workflow
+- Real-world parser cleanup for noisy deck exports
+- Resilient API fallbacks
+- Fast, no-framework JavaScript architecture
 
 ## License
 
-MIT License. See LICENSE file for details.
+MIT License. See `LICENSE`.

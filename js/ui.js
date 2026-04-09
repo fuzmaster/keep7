@@ -12,7 +12,6 @@ import {
 } from './storage.js';
 import { deckHash }        from './hash.js';
 import { evalHand, computeSessionStats, landCountFromDeck, pLandInDraws, keepLabel } from './metrics.js';
-import { openZoom }        from './zoom.js';
 import { SAMPLE_DECK }     from './sampleDeck.js';
 import { loadRandomWebDeck } from './remoteDeck.js';
 
@@ -22,6 +21,11 @@ const ANY_DECK_TYPE = '__any__';
 function getImageUrl(card, size) {
   const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
   return uris ? uris[size] || uris.small || uris.normal || null : null;
+}
+
+function getZoomImageUrl(card) {
+  const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
+  return uris ? uris.large || uris.normal || uris.small || null : null;
 }
 
 function preloadImages(cards) {
@@ -48,6 +52,7 @@ export function createApp() {
   const actionBar       = byId('action-bar');
   const headerRight     = byId('header-right');
   const validationBanner = byId('validation-banner');
+  const zoomModal       = byId('zoom-modal');
   const savedHint       = byId('saved-hint');
   const handLabel       = byId('hand-label');
   const statsPanel      = byId('stats-panel');
@@ -61,6 +66,33 @@ export function createApp() {
   let currentHash   = null;
   let deckLandCount = 0;
   let openerSamples = []; // { landCount, wasKept }
+
+  function closeZoomModal() {
+    if (!zoomModal) return;
+    zoomModal.className = 'hidden';
+    zoomModal.innerHTML = '';
+  }
+
+  function openZoomModal(card) {
+    if (!zoomModal) return;
+    const src = getZoomImageUrl(card);
+    if (!src) return;
+
+    zoomModal.innerHTML = '';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = card.name;
+    zoomModal.appendChild(img);
+
+    const label = document.createElement('div');
+    label.className = 'zoom-card-name';
+    label.textContent = card.name;
+    zoomModal.appendChild(label);
+
+    zoomModal.className = 'zoom-overlay';
+    zoomModal.focus();
+  }
 
   function clearHint() {
     if (!savedHint) return;
@@ -145,7 +177,7 @@ export function createApp() {
       slot.setAttribute('tabindex', '0');
       slot.setAttribute('aria-label', `View ${card.name}`);
 
-      const zoom = () => openZoom(card);
+      const zoom = () => openZoomModal(card);
       slot.addEventListener('click', zoom);
       slot.addEventListener('keydown', e => { if (e.key === 'Enter') zoom(); });
 
@@ -440,6 +472,10 @@ export function createApp() {
     btnMull?.addEventListener('click', trackMulligan);
     btnKeep?.addEventListener('click', trackKeep);
     btnReset?.addEventListener('click', dealHand);
+    zoomModal?.addEventListener('click', closeZoomModal);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !zoomModal?.classList.contains('hidden')) closeZoomModal();
+    });
   }
 
   return {
