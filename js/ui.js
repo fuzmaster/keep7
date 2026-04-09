@@ -12,6 +12,7 @@ import {
 } from './storage.js';
 import { deckHash }        from './hash.js';
 import { evalHand, computeSessionStats, landCountFromDeck, pLandInDraws, keepLabel } from './metrics.js';
+import { openZoom }        from './zoom.js';
 import { SAMPLE_DECK }     from './sampleDeck.js';
 import { loadRandomWebDeck } from './remoteDeck.js';
 
@@ -21,11 +22,6 @@ const ANY_DECK_TYPE = '__any__';
 function getImageUrl(card, size) {
   const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
   return uris ? uris[size] || uris.small || uris.normal || null : null;
-}
-
-function getZoomImageUrl(card) {
-  const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
-  return uris ? uris.large || uris.normal || uris.small || null : null;
 }
 
 function preloadImages(cards) {
@@ -52,7 +48,6 @@ export function createApp() {
   const actionBar       = byId('action-bar');
   const headerRight     = byId('header-right');
   const validationBanner = byId('validation-banner');
-  const zoomModal       = byId('zoom-modal');
   const savedHint       = byId('saved-hint');
   const handLabel       = byId('hand-label');
   const statsPanel      = byId('stats-panel');
@@ -66,33 +61,6 @@ export function createApp() {
   let currentHash   = null;
   let deckLandCount = 0;
   let openerSamples = []; // { landCount, wasKept }
-
-  function closeZoomModal() {
-    if (!zoomModal) return;
-    zoomModal.className = 'hidden';
-    zoomModal.innerHTML = '';
-  }
-
-  function openZoomModal(card) {
-    if (!zoomModal) return;
-    const src = getZoomImageUrl(card);
-    if (!src) return;
-
-    zoomModal.innerHTML = '';
-
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = card.name;
-    zoomModal.appendChild(img);
-
-    const label = document.createElement('div');
-    label.className = 'zoom-card-name';
-    label.textContent = card.name;
-    zoomModal.appendChild(label);
-
-    zoomModal.className = 'zoom-overlay';
-    zoomModal.focus();
-  }
 
   function clearHint() {
     if (!savedHint) return;
@@ -144,7 +112,9 @@ export function createApp() {
       });
       return { remote, usedAnyFallback: false, requestedType: selectedType };
     } catch (firstError) {
-      if (selectedType === ANY_DECK_TYPE) throw firstError;
+      if (selectedType === ANY_DECK_TYPE || firstError?.code !== 'NO_DECKS_FOR_TYPE') {
+        throw firstError;
+      }
 
       const remote = await loadRandomWebDeck({
         deckType: ANY_DECK_TYPE,
@@ -177,7 +147,7 @@ export function createApp() {
       slot.setAttribute('tabindex', '0');
       slot.setAttribute('aria-label', `View ${card.name}`);
 
-      const zoom = () => openZoomModal(card);
+      const zoom = () => openZoom(card);
       slot.addEventListener('click', zoom);
       slot.addEventListener('keydown', e => { if (e.key === 'Enter') zoom(); });
 
@@ -395,7 +365,14 @@ export function createApp() {
     } catch (err) {
       console.error('handleStart error', err);
       masterDeck = [];
-      alert('Error fetching cards from Scryfall. Check your connection and try again.');
+      const isFileProtocol = window.location.protocol === 'file:';
+      const isNetworkError = err?.name === 'TypeError' || err?.name === 'AbortError';
+      const hint = isFileProtocol
+        ? '\n\nTip: run this app from a local web server (not file://).'
+        : '';
+      alert(isNetworkError
+        ? `Could not reach Scryfall. Check your internet, VPN/adblock, or firewall and try again.${hint}`
+        : `Error fetching cards from Scryfall. Please try again.${hint}`);
     } finally {
       restore();
       loading = false;
@@ -427,7 +404,10 @@ export function createApp() {
     } catch (err) {
       console.error('handleRandomWebDeck error', err);
       if (decklistInput) decklistInput.value = SAMPLE_DECK;
-      showHint('Web deck unavailable right now. Loaded local sample deck instead.');
+      const isNetworkError = err?.name === 'TypeError' || err?.name === 'AbortError';
+      showHint(isNetworkError
+        ? 'Could not reach web deck source. Loaded local sample deck instead.'
+        : 'Web deck unavailable right now. Loaded local sample deck instead.');
     } finally {
       loading = false;
       if (btnWebSample) {
@@ -472,10 +452,6 @@ export function createApp() {
     btnMull?.addEventListener('click', trackMulligan);
     btnKeep?.addEventListener('click', trackKeep);
     btnReset?.addEventListener('click', dealHand);
-    zoomModal?.addEventListener('click', closeZoomModal);
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && !zoomModal?.classList.contains('hidden')) closeZoomModal();
-    });
   }
 
   return {

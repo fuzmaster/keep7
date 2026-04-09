@@ -2,28 +2,64 @@ import { getFrontFaceName } from './parser.js';
 
 const CHUNK_SIZE = 75;
 const THROTTLE_MS = 150;
+const REQUEST_TIMEOUT_MS = 12000;
+const MAX_RETRIES = 2;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchChunk(names) {
-  const response = await fetch('https://api.scryfall.com/cards/collection', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ identifiers: names.map((name) => ({ name })) })
-  });
+async function fetchChunk(names, retries = MAX_RETRIES) {
+  let lastError = null;
 
-  if (!response.ok) {
-    const err = new Error(`Scryfall request failed with ${response.status}`);
-    err.status = response.status;
-    throw err;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+    try {
+      const response = await fetch('https://api.scryfall.com/cards/collection', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({ identifiers: names.map((name) => ({ name })) })
+      });
+
+      if (!response.ok) {
+        const err = new Error(`Scryfall request failed with ${response.status}`);
+        err.status = response.status;
+
+        // Retry transient API/rate-limit errors.
+        if ((response.status === 429 || response.status >= 500) && attempt < retries) {
+          const backoffMs = response.status === 429 ? 2000 : 800 * (attempt + 1);
+          await sleep(backoffMs);
+          continue;
+        }
+
+        throw err;
+      }
+
+      return await response.json();
+    } catch (err) {
+      lastError = err;
+
+      // Retry network and timeout failures.
+      const isAbort = err?.name === 'AbortError';
+      const isNetwork = err?.name === 'TypeError';
+      if ((isAbort || isNetwork) && attempt < retries) {
+        await sleep(600 * (attempt + 1));
+        continue;
+      }
+
+      if (attempt >= retries) throw err;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
-  return response.json();
+  throw lastError || new Error('Scryfall request failed.');
 }
 
 export async function fetchCards(cardNames, onProgress) {
@@ -40,17 +76,7 @@ export async function fetchCards(cardNames, onProgress) {
       onProgress(i + 1, chunks.length);
     }
 
-    let data;
-    try {
-      data = await fetchChunk(chunks[i]);
-    } catch (err) {
-      if (err.status === 429) {
-        await sleep(2000);
-        data = await fetchChunk(chunks[i]);
-      } else {
-        throw err;
-      }
-    }
+    const data = await fetchChunk(chunks[i]);
 
     allCards.push(...(data.data || []));
 

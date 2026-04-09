@@ -105,7 +105,9 @@ function pickDeckCandidate(deckList, deckType) {
     .sort(sortByReleaseDateDesc);
 
   if (!candidates.length) {
-    throw new Error(`No decks found for type: ${deckType}.`);
+    const error = new Error(`No decks found for type: ${deckType}.`);
+    error.code = 'NO_DECKS_FOR_TYPE';
+    throw error;
   }
 
   const pool = candidates.slice(0, MAX_RECENT_CANDIDATES);

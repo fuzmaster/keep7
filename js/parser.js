@@ -28,9 +28,12 @@ export function parseDecklist(text) {
       continue;
     }
 
+    if (/^SB:\s*/i.test(raw)) {
+      continue;
+    }
+
     let cleaned = raw
       .replace(/^\*?\s*/, '')
-      .replace(/^SB:\s*/i, '')
       .replace(/\t+/g, ' ')
       .trim();
 

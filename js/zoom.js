@@ -1,6 +1,8 @@
 // Shared zoom modal — imported once; side-effects bind events on load
 const modal = document.getElementById('zoom-modal');
-modal.setAttribute('tabindex', '-1');
+if (modal) {
+  modal.setAttribute('tabindex', '-1');
+}
 
 function getImageUrl(card, size) {
   const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
@@ -8,6 +10,7 @@ function getImageUrl(card, size) {
 }
 
 export function openZoom(card) {
+  if (!modal) return;
   const src = getImageUrl(card, 'normal');
   if (!src && card.placeholder) return;
 
@@ -27,11 +30,14 @@ export function openZoom(card) {
 }
 
 export function closeZoom() {
+  if (!modal) return;
   modal.className = 'hidden';
   modal.innerHTML = '';
 }
 
-modal.addEventListener('click', closeZoom);
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeZoom();
-});
+if (modal) {
+  modal.addEventListener('click', closeZoom);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeZoom();
+  });
+}
