@@ -1,0 +1,12 @@
+{
+  "name": "Keep7 – Deck Consistency Lab",
+  "short_name": "Keep7",
+  "description": "MTG opening hand tester. Test hands, goldfish turns, compare decks.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#07090f",
+  "icons": [
+    { "src": "./favicon-card.svg", "type": "image/svg+xml", "sizes": "any" }
+  ]
+}

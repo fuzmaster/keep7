@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog – Keep7</title>
+  <link rel="icon" href="./favicon-card.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .changelog-wrap { max-width: 680px; margin: 0 auto; padding: 32px 20px 64px; }
+    .changelog-back { display: inline-block; margin-bottom: 28px; color: var(--text-secondary); font-size: 0.85rem; text-decoration: none; }
+    .changelog-back:hover { color: var(--text-primary); }
+    .changelog-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--keep); margin-bottom: 32px; }
+    .cl-entry { margin-bottom: 32px; }
+    .cl-version { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .cl-date { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px; }
+    .cl-item { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 6px; padding-left: 14px; position: relative; line-height: 1.5; }
+    .cl-item::before { content: '·'; position: absolute; left: 0; color: var(--keep); }
+    .cl-tag { display: inline-block; font-size: 0.65rem; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 6px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+    .cl-tag--fix { background: rgba(239,68,68,0.15); color: #f87171; }
+    .cl-tag--new { background: rgba(74,222,128,0.12); color: var(--keep); }
+    .cl-tag--imp { background: rgba(168,85,247,0.15); color: var(--purple); }
+  </style>
+</head>
+<body>
+  <div class="changelog-wrap">
+    <a class="changelog-back" href="./index.html">← Back to Keep7</a>
+    <h1 class="changelog-title">Changelog</h1>
+
+    <div class="cl-entry">
+      <div class="cl-version">v1.1</div>
+      <div class="cl-date">Current release</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--fix">fix</span>Replaced browser <code>alert()</code> dialogs with inline error messages throughout.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--imp">imp</span>Desktop layout expands to full width — no more narrow 520 px column on large screens.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--imp">imp</span>Card grids are now responsive using auto-fill columns instead of fixed 4-column layouts.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--fix">fix</span>Hand evaluation and stats panel rendering now uses safe DOM construction throughout (no innerHTML with data).</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--fix">fix</span>Race mode verdict renders via DOM API — eliminates HTML injection risk.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--imp">imp</span>Deck size limits (0–500 cards) enforced with user-facing messages instead of silent failures.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--new">new</span>PWA manifest added — install Keep7 to your home screen on mobile.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--imp">imp</span>Focus indicators added for full keyboard navigation.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--imp">imp</span>Roadmap section moved here — the home screen now shows what the tool does, not what it doesn't.</div>
+    </div>
+
+    <div class="cl-entry">
+      <div class="cl-version">v1.0</div>
+      <div class="cl-date">Initial release</div>
+      <div class="cl-item">Hand Test mode — paste decklist, draw 7, keep or mulligan.</div>
+      <div class="cl-item">Goldfish mode — step through turns 1–5 and track your mana development.</div>
+      <div class="cl-item">Deck Race — compare two decklists across 20 simulated opening hands.</div>
+      <div class="cl-item">Scryfall API integration with local caching (7-day TTL, 5-deck LRU).</div>
+      <div class="cl-item">Random web deck loader via MTGJSON catalog.</div>
+    </div>
+
+    <div class="cl-entry">
+      <div class="cl-version">Roadmap</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--new">planned</span>Share your hand — save an image to post to social.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--new">planned</span>10,000-hand simulation for exact flood/screw percentages.</div>
+      <div class="cl-item"><span class="cl-tag cl-tag--new">planned</span>Moxfield sync — connect your account, skip the copy/paste.</div>
+    </div>
+  </div>
+</body>
+</html>

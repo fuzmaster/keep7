@@ -9,20 +9,32 @@ import { appendCardSlot }    from './domUtils.js';
 
 const byId = id => document.getElementById(id);
 
+function showInlineError(el, message) {
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('hidden');
+}
+function clearInlineError(el) {
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
+}
+
 export function createRaceApp() {
-  const inputEl      = byId('race-input');
-  const resultsEl    = byId('race-results');
-  const textAEl      = byId('race-deck-a');
-  const textBEl      = byId('race-deck-b');
-  const btnCmp       = byId('btn-race-compare');
-  const statusEl     = byId('race-status');
-  const handAEl      = byId('race-hand-a');
-  const handBEl      = byId('race-hand-b');
-  const statsAEl     = byId('race-stats-a');
-  const statsBEl     = byId('race-stats-b');
-  const verdictEl    = byId('race-verdict');
-  const btnNewHands  = byId('btn-race-new-hands');
-  const btnRaceReset = byId('btn-race-reset');
+  const inputEl       = byId('race-input');
+  const resultsEl     = byId('race-results');
+  const textAEl       = byId('race-deck-a');
+  const textBEl       = byId('race-deck-b');
+  const btnCmp        = byId('btn-race-compare');
+  const statusEl      = byId('race-status');
+  const handAEl       = byId('race-hand-a');
+  const handBEl       = byId('race-hand-b');
+  const statsAEl      = byId('race-stats-a');
+  const statsBEl      = byId('race-stats-b');
+  const verdictEl     = byId('race-verdict');
+  const btnNewHands   = byId('btn-race-new-hands');
+  const btnRaceReset  = byId('btn-race-reset');
+  const raceInputError = byId('race-input-error');
 
   let deckA = null;
   let deckB = null;
@@ -31,23 +43,20 @@ export function createRaceApp() {
     if (!statusEl) return;
     if (!msg) { statusEl.className = 'race-status hidden'; return; }
     statusEl.textContent = msg;
-    statusEl.className   = spin ? 'race-status race-status--spin' : 'race-status race-status--err';
+    statusEl.className = spin ? 'race-status race-status--spin' : 'race-status race-status--err';
   }
 
   async function loadOneDeck(raw, label, onProgress) {
     const { cardMap } = parseDecklist(raw);
     if (!cardMap.size) throw new Error(`Could not parse ${label} — check the format.`);
-
-    const hash  = deckHash(raw);
-    let cards   = loadCardCacheByHash(hash);
-
+    const hash = deckHash(raw);
+    let cards  = loadCardCacheByHash(hash);
     if (!cards) {
       const names = Array.from(cardMap.keys());
       cards = await fetchCards(names, (c, t) =>
         onProgress(t > 1 ? `${label}: ${c}/${t}…` : `${label}…`, true));
       saveCardCacheByHash(hash, cards);
     }
-
     const { deck } = buildDeck(cardMap, cards);
     return deck;
   }
@@ -69,16 +78,31 @@ export function createRaceApp() {
     });
   }
 
+  // Safe DOM-based stats render — no innerHTML with data
   function renderStats(container, st) {
     if (!container) return;
-    container.innerHTML = `
-      <div class="rc-stat"><span class="rc-label">Keep Rate</span><span class="rc-value">${st.keepRate}%</span></div>
-      <div class="rc-stat"><span class="rc-label">Avg Opener Lands</span><span class="rc-value">${st.avgLands}</span></div>
-      <div class="rc-stat"><span class="rc-label">T3 Land Hit</span><span class="rc-value rc-note">~${st.avgT3Land}%</span></div>
-      <div class="rc-stat"><span class="rc-label">Flood Risk</span><span class="rc-value">${st.floodRisk}%</span></div>
-      <div class="rc-stat"><span class="rc-label">Screw Risk</span><span class="rc-value">${st.screwRisk}%</span></div>
-      <div class="rc-stat"><span class="rc-label">Deck / Lands</span><span class="rc-value">${st.deckSize} / ${st.totalLands}</span></div>
-    `;
+    container.innerHTML = '';
+    const rows = [
+      ['Keep Rate',        `${st.keepRate}%`],
+      ['Avg Opener Lands', `${st.avgLands}`],
+      ['T3 Land Hit',      `~${st.avgT3Land}%`, true],
+      ['Flood Risk',       `${st.floodRisk}%`],
+      ['Screw Risk',       `${st.screwRisk}%`],
+      ['Deck / Lands',     `${st.deckSize} / ${st.totalLands}`],
+    ];
+    rows.forEach(([labelText, valueText, note]) => {
+      const chip = document.createElement('div');
+      chip.className = 'rc-stat';
+      const lbl = document.createElement('span');
+      lbl.className = 'rc-label';
+      lbl.textContent = labelText;
+      const val = document.createElement('span');
+      val.className = 'rc-value' + (note ? ' rc-note' : '');
+      val.textContent = valueText;
+      chip.appendChild(lbl);
+      chip.appendChild(val);
+      container.appendChild(chip);
+    });
   }
 
   function dealHands() {
@@ -90,7 +114,15 @@ export function createRaceApp() {
   async function handleCompare() {
     const rawA = textAEl?.value?.trim();
     const rawB = textBEl?.value?.trim();
-    if (!rawA || !rawB) { alert('Paste both decklists to compare.'); return; }
+
+    // Inline validation — no alert()
+    if (!rawA || !rawB) {
+      showInlineError(raceInputError, 'Paste a decklist into both Deck A and Deck B before comparing.');
+      if (!rawA) textAEl?.focus();
+      else textBEl?.focus();
+      return;
+    }
+    clearInlineError(raceInputError);
 
     if (btnCmp) btnCmp.disabled = true;
     setStatus('Loading Deck A…', true);
@@ -108,18 +140,20 @@ export function createRaceApp() {
       renderStats(statsBEl, stB);
 
       if (verdictEl) {
-        const lines = generateVerdict(stA, stB);
         verdictEl.innerHTML = '';
         const head = document.createElement('div');
         head.className = 'verdict-head';
         head.textContent = 'Analysis';
         verdictEl.appendChild(head);
+
+        const lines = generateVerdict(stA, stB);
         lines.forEach(l => {
           const line = document.createElement('div');
           line.className = 'verdict-line';
           line.textContent = `· ${l}`;
           verdictEl.appendChild(line);
         });
+
         const note = document.createElement('div');
         note.className = 'verdict-note';
         note.textContent = 'Heuristic — based on 20 simulated openers per deck';
@@ -148,6 +182,9 @@ export function createRaceApp() {
         resultsEl?.classList.add('hidden');
         inputEl?.classList.remove('hidden');
       });
+      // Clear error on typing
+      textAEl?.addEventListener('input', () => clearInlineError(raceInputError));
+      textBEl?.addEventListener('input', () => clearInlineError(raceInputError));
     },
   };
 }

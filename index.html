@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Keep7 – Deck Consistency Lab</title>
-  <meta name="description" content="Test opening hands, goldfish early turns, and compare decks. A fast MTG deck consistency lab.">
+  <meta name="description" content="Test MTG opening hands, goldfish early turns, and compare decks. Free, fast, mobile-first.">
   <meta property="og:title" content="Keep7 – Deck Consistency Lab">
   <meta property="og:description" content="Opening hand tester, goldfish mode, and deck race. Free, fast, client-side.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#07090f">
   <link rel="icon" href="./favicon-card.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -29,14 +30,16 @@
       </nav>
       <div id="header-right" class="header-right"></div>
     </header>
+
     <div id="mode-handtest" class="mode-panel" role="tabpanel">
       <section id="input-section" class="input-section">
         <h1 class="hero-headline">Deck Consistency Lab</h1>
-        <p class="hero-sub">Test opening hands. Measure reliability.</p>
+        <p class="hero-sub">Paste your decklist. Draw 7 cards. Know if your mana base holds up.</p>
         <label for="decklist-input" class="sr-only">Paste your decklist</label>
         <textarea id="decklist-input" class="decklist-input"
           placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Lightning Bolt&#10;35 Plains&#10;..."
           aria-label="Decklist input"></textarea>
+        <div id="input-error" class="input-error hidden" role="alert" aria-live="assertive"></div>
         <div class="input-actions">
           <button id="btn-sample" class="btn-sample" type="button">Sample deck</button>
           <label for="web-deck-type" class="sr-only">Web deck type</label>
@@ -48,19 +51,11 @@
             <option value="__any__">Any Type</option>
           </select>
           <button id="btn-web-sample" class="btn-sample" type="button">Random Web Deck</button>
-          <button id="btn-start"  class="btn-start"  type="button">Test Opening Hand</button>
+          <button id="btn-start" class="btn-start" type="button">Test Opening Hand</button>
         </div>
         <div id="saved-hint" class="saved-hint hidden"></div>
-        <div class="roadmap-section">
-          <h3>What's coming next</h3>
-          <p>Keep7 is free. Testing 100-card decks on a phone screen is frustrating, so I built this to fix it. Here is what I am adding next:</p>
-          <ul>
-            <li><strong>Share your hand:</strong> A button to save an image of your opening hand to post straight to Twitter.</li>
-            <li><strong>10,000-hand tests:</strong> The current Deck Race runs 20 hands. The next update will run 10,000 in the background to give you exact flood and screw percentages.</li>
-            <li><strong>Moxfield sync:</strong> Connect your account so you never have to copy and paste a text list again.</li>
-          </ul>
-        </div>
       </section>
+
       <section id="test-section" class="test-section hidden" aria-label="Hand testing">
         <div class="test-header">
           <span class="section-label" id="hand-label" tabindex="-1">Opening Hand</span>
@@ -76,12 +71,14 @@
         <div id="stats-panel" class="stats-panel" aria-live="polite"></div>
         <div id="validation-banner" class="validation-banner hidden"></div>
       </section>
+
       <div id="action-bar" class="action-bar hidden" role="toolbar" aria-label="Hand actions">
         <button id="btn-mull"  class="btn btn-mull"         type="button" aria-label="Mulligan">Mulligan</button>
         <button id="btn-keep"  class="btn btn-keep"         type="button" aria-label="Keep hand">Keep</button>
         <button id="btn-reset" class="btn btn-new hidden"   type="button" aria-label="New hand">New Hand</button>
       </div>
     </div><!-- /mode-handtest -->
+
     <div id="mode-goldfish" class="mode-panel hidden" role="tabpanel">
       <div id="gf-idle">
         <div class="mode-idle">
@@ -122,6 +119,7 @@
         </div>
       </div>
     </div><!-- /mode-goldfish -->
+
     <div id="mode-race" class="mode-panel hidden" role="tabpanel">
       <div id="race-input">
         <div class="race-decks">
@@ -136,6 +134,7 @@
               placeholder="1 Sol Ring&#10;35 Islands&#10;..." aria-label="Deck B decklist"></textarea>
           </div>
         </div>
+        <div id="race-input-error" class="input-error hidden" role="alert" aria-live="assertive"></div>
         <div class="race-input-actions">
           <button id="btn-race-compare" class="btn-primary" type="button">Compare Decks</button>
         </div>
@@ -175,12 +174,9 @@
 
   <footer class="app-footer" role="contentinfo">
     <div class="app-footer-links">
-      <a class="app-footer-link" href="https://forms.gle/JVfmheEevuJtwwBH8">
-        Report a bug or request a feature
-      </a>
-      <a class="app-footer-link" href="https://www.paypal.com/donate/?hosted_button_id=47A4JJ4WNBY9U">
-        Donate
-      </a>
+      <a class="app-footer-link" href="./changelog.html">Changelog</a>
+      <a class="app-footer-link" href="https://forms.gle/JVfmheEevuJtwwBH8">Report a bug / request a feature</a>
+      <a class="app-footer-link" href="https://www.paypal.com/donate/?hosted_button_id=47A4JJ4WNBY9U">Donate</a>
     </div>
   </footer>
 

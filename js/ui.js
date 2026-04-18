@@ -27,6 +27,18 @@ function preloadImages(cards) {
   }
 }
 
+// ── Inline error helpers (replaces alert()) ─────────────────────────
+function showInlineError(el, message) {
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('hidden');
+}
+function clearInlineError(el) {
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
+}
+
 export function createApp() {
   const inputSection    = byId('input-section');
   const testSection     = byId('test-section');
@@ -48,6 +60,7 @@ export function createApp() {
   const handLabel       = byId('hand-label');
   const statsPanel      = byId('stats-panel');
   const handEvalEl      = byId('hand-eval');
+  const inputError      = byId('input-error');
 
   let masterDeck    = [];
   let deckState     = null;
@@ -56,7 +69,7 @@ export function createApp() {
   let currentHand   = [];
   let currentHash   = null;
   let deckLandCount = 0;
-  let openerSamples = []; // { landCount, wasKept }
+  let openerSamples = [];
 
   function clearHint() {
     if (!savedHint) return;
@@ -88,8 +101,7 @@ export function createApp() {
     const leadText = usedAnyFallback
       ? `No ${requestedType} decks available right now. Loaded ${deckType}: ${deckName}. `
       : `Loaded ${deckType}: ${deckName}. `;
-    const lead = document.createTextNode(leadText);
-    savedHint.appendChild(lead);
+    savedHint.appendChild(document.createTextNode(leadText));
 
     const link = document.createElement('a');
     if (remote.sourceUrl && isValidSourceUrl(remote.sourceUrl)) {
@@ -113,24 +125,12 @@ export function createApp() {
 
   async function loadRandomWebDeckWithFallback() {
     const selectedType = webDeckType?.value || 'Commander Deck';
-
     try {
-      const remote = await loadRandomWebDeck({
-        deckType: selectedType,
-        retries: 2,
-        timeoutMs: 10000,
-      });
+      const remote = await loadRandomWebDeck({ deckType: selectedType, retries: 2, timeoutMs: 10000 });
       return { remote, usedAnyFallback: false, requestedType: selectedType };
     } catch (firstError) {
-      if (selectedType === ANY_DECK_TYPE || firstError?.code !== 'NO_DECKS_FOR_TYPE') {
-        throw firstError;
-      }
-
-      const remote = await loadRandomWebDeck({
-        deckType: ANY_DECK_TYPE,
-        retries: 2,
-        timeoutMs: 10000,
-      });
+      if (selectedType === ANY_DECK_TYPE || firstError?.code !== 'NO_DECKS_FOR_TYPE') throw firstError;
+      const remote = await loadRandomWebDeck({ deckType: ANY_DECK_TYPE, retries: 2, timeoutMs: 10000 });
       return { remote, usedAnyFallback: true, requestedType: selectedType };
     }
   }
@@ -151,7 +151,6 @@ export function createApp() {
     container.innerHTML = '';
     cards.forEach((card, i) => {
       const zoom = () => openZoom(card);
-
       appendCardSlot(container, card, {
         index: i,
         delayMs: 35,
@@ -192,11 +191,11 @@ export function createApp() {
     statsPanel.innerHTML = '';
     const stats = [
       { label: 'Keep Rate', value: `${s.keepRate}%` },
-      { label: 'K / M', value: `${s.keeps} / ${s.mulls}` },
+      { label: 'K / M',     value: `${s.keeps} / ${s.mulls}` },
       { label: 'Avg Lands', value: s.avgLands },
-      { label: '2-Land %', value: `${s.twoLandPct}%` },
-      { label: '3-Land %', value: `${s.threeLandPct}%` },
-      { label: 'Openers', value: s.openers, faint: true },
+      { label: '2-Land %',  value: `${s.twoLandPct}%` },
+      { label: '3-Land %',  value: `${s.threeLandPct}%` },
+      { label: 'Openers',   value: s.openers, faint: true },
     ];
     stats.forEach(stat => {
       const chip = document.createElement('div');
@@ -211,6 +210,7 @@ export function createApp() {
       chip.appendChild(value);
       statsPanel.appendChild(chip);
     });
+
     if (handEvalEl && ev) {
       const lbl = keepLabel(ev);
       const t3  = pLandInDraws(deckLandCount - ev.landCount, masterDeck.length - 7, 3);
@@ -234,25 +234,43 @@ export function createApp() {
     }
   }
 
-  // ── Validation ──────────────────────────────────────────────
+  // ── Validation banner ────────────────────────────────────────
   const VALID_DECK_SIZES = [40, 60, 99, 100];
   function showValidation(deckSize, notFound, parseErrors) {
     if (!validationBanner) return;
-    let html = `<span class="vb-ok">${deckSize} cards loaded</span>`;
+    validationBanner.innerHTML = '';
+
+    const ok = document.createElement('span');
+    ok.className = 'vb-ok';
+    ok.textContent = `${deckSize} cards loaded`;
+    validationBanner.appendChild(ok);
+
     if (!VALID_DECK_SIZES.includes(deckSize)) {
-      html += ` <span class="vb-warn">· unusual size</span>`;
+      const warn = document.createElement('span');
+      warn.className = 'vb-warn';
+      warn.textContent = ' · unusual size';
+      validationBanner.appendChild(warn);
     }
+
     if (notFound.length) {
-      html += `<div class="vb-err">${notFound.length} not found: ${notFound.slice(0, 5).join(', ')}${notFound.length > 5 ? '…' : ''}</div>`;
+      const err = document.createElement('div');
+      err.className = 'vb-err';
+      err.textContent = `${notFound.length} not found: ${notFound.slice(0, 5).join(', ')}${notFound.length > 5 ? '…' : ''}`;
+      validationBanner.appendChild(err);
     }
+
     if (parseErrors.length) {
-      html += `<div class="vb-err">${parseErrors.length} line${parseErrors.length > 1 ? 's' : ''} skipped</div>`;
+      const err = document.createElement('div');
+      err.className = 'vb-err';
+      err.textContent = `${parseErrors.length} line${parseErrors.length > 1 ? 's' : ''} skipped`;
+      validationBanner.appendChild(err);
     }
-    validationBanner.innerHTML = html;
+
     const d = document.createElement('button');
     d.className = 'vb-dismiss'; d.type = 'button'; d.textContent = '✕';
     d.addEventListener('click', () => validationBanner.classList.add('hidden'));
     validationBanner.appendChild(d);
+
     validationBanner.className = 'validation-banner fade-in';
   }
 
@@ -337,8 +355,14 @@ export function createApp() {
   // ── Load deck ────────────────────────────────────────────────
   async function handleStart() {
     if (loading) return;
+    clearInlineError(inputError);
+
     const text = decklistInput?.value?.trim();
-    if (!text) { decklistInput?.focus(); return; }
+    if (!text) {
+      showInlineError(inputError, 'Paste a decklist above before testing.');
+      decklistInput?.focus();
+      return;
+    }
 
     loading = true;
     const orig = btnStart.textContent;
@@ -349,7 +373,7 @@ export function createApp() {
     if (!cardMap.size) {
       restore();
       loading = false;
-      alert('Could not parse any cards.\n\nExpected:\n1 Sol Ring\n4 Lightning Bolt');
+      showInlineError(inputError, 'Could not parse any cards. Expected format: "1 Sol Ring"');
       return;
     }
 
@@ -357,13 +381,13 @@ export function createApp() {
     if (totalCards === 0) {
       restore();
       loading = false;
-      alert('Deck cannot be empty.');
+      showInlineError(inputError, 'Deck cannot be empty.');
       return;
     }
     if (totalCards > 500) {
       restore();
       loading = false;
-      alert('Deck exceeds reasonable size limit (500 cards).');
+      showInlineError(inputError, 'Deck exceeds the 500-card limit.');
       return;
     }
 
@@ -400,12 +424,12 @@ export function createApp() {
       masterDeck = [];
       const isFileProtocol = window.location.protocol === 'file:';
       const isNetworkError = err?.name === 'TypeError' || err?.name === 'AbortError';
-      const hint = isFileProtocol
-        ? '\n\nTip: run this app from a local web server (not file://).'
-        : '';
-      alert(isNetworkError
-        ? `Could not reach Scryfall. Check your internet, VPN/adblock, or firewall and try again.${hint}`
-        : `Error fetching cards from Scryfall. Please try again.${hint}`);
+      const hint = isFileProtocol ? ' Run this app from a local web server (not file://).' : '';
+      showInlineError(inputError,
+        isNetworkError
+          ? `Could not reach Scryfall. Check your internet connection and try again.${hint}`
+          : `Error fetching cards from Scryfall. Please try again.${hint}`
+      );
     } finally {
       restore();
       loading = false;
@@ -420,14 +444,9 @@ export function createApp() {
 
   async function handleRandomWebDeck() {
     if (loading) return;
-
     loading = true;
     const orig = btnWebSample?.textContent || 'Random Web Deck';
-
-    if (btnWebSample) {
-      btnWebSample.disabled = true;
-      btnWebSample.textContent = 'Loading…';
-    }
+    if (btnWebSample) { btnWebSample.disabled = true; btnWebSample.textContent = 'Loading…'; }
     if (btnStart) btnStart.disabled = true;
 
     try {
@@ -443,10 +462,7 @@ export function createApp() {
         : 'Web deck unavailable right now. Loaded local sample deck instead.');
     } finally {
       loading = false;
-      if (btnWebSample) {
-        btnWebSample.disabled = false;
-        btnWebSample.textContent = orig;
-      }
+      if (btnWebSample) { btnWebSample.disabled = false; btnWebSample.textContent = orig; }
       if (btnStart) btnStart.disabled = false;
     }
   }
@@ -472,8 +488,7 @@ export function createApp() {
   function restoreWebDeckType() {
     const saved = loadWebDeckType();
     if (!saved || !webDeckType) return;
-
-    const hasOption = Array.from(webDeckType.options).some(option => option.value === saved);
+    const hasOption = Array.from(webDeckType.options).some(o => o.value === saved);
     if (hasOption) webDeckType.value = saved;
   }
 
@@ -485,6 +500,9 @@ export function createApp() {
     btnMull?.addEventListener('click', trackMulligan);
     btnKeep?.addEventListener('click', trackKeep);
     btnReset?.addEventListener('click', dealHand);
+
+    // Clear inline error on user typing
+    decklistInput?.addEventListener('input', () => clearInlineError(inputError));
   }
 
   return {
