@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" width="200" height="40">
+  <defs>
+    <style>
+      .keep7-text { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 28px; letter-spacing: -0.02em; }
+      .keep7-main { fill: #e9ecf5; }
+      .keep7-accent { fill: #e8b836; }
+    </style>
+  </defs>
+  <text x="0" y="30" class="keep7-text keep7-main">Keep</text>
+  <text x="120" y="30" class="keep7-text keep7-accent">7</text>
+</svg>

@@ -1,0 +1,98 @@
+.panel {
+  padding: 0.75rem;
+  background: var(--bg-surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-faint);
+  margin-top: 0.75rem;
+}
+
+.evalBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.keep {
+  background: var(--keep-dim);
+  color: var(--keep);
+}
+
+.mull {
+  background: var(--mull-dim);
+  color: var(--mull);
+}
+
+.gold {
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.375rem;
+}
+
+.chip {
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 0.375rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.chipLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chipValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sessionHeader {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Race stats */
+.racePanel {
+  background: var(--bg-surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-faint);
+  padding: 0.75rem;
+}
+
+.raceLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.raceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.375rem;
+}
+
+@media (min-width: 640px) {
+  .raceGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

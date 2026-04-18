@@ -1,0 +1,75 @@
+.bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-faint);
+  z-index: 90;
+  align-items: center;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 42px;
+  transition: opacity 0.12s, transform 0.12s;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.btnMull {
+  background: var(--mull);
+  color: #fff;
+}
+
+.btnKeep {
+  background: var(--keep);
+  color: #07090f;
+}
+
+.btnNew {
+  background: var(--purple);
+  color: #fff;
+}
+
+.btnReset {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  margin-left: auto;
+}
+
+.counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .bar {
+    position: sticky;
+    border-radius: 10px;
+    margin-top: 0.75rem;
+    border: 1px solid var(--border-faint);
+  }
+}
