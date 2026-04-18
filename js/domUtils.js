@@ -57,7 +57,14 @@ export function createCardSlot(card, options = {}) {
   } else {
     const ph = document.createElement('div');
     ph.className = 'card-placeholder';
-    ph.textContent = card.name;
+    const name = document.createElement('div');
+    name.className = 'card-placeholder__name';
+    name.textContent = card.name;
+    const meta = document.createElement('div');
+    meta.className = 'card-placeholder__meta';
+    meta.textContent = card.placeholder ? 'Image unavailable' : 'No preview';
+    ph.appendChild(name);
+    ph.appendChild(meta);
     slot.appendChild(ph);
   }
 

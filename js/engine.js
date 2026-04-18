@@ -1,3 +1,18 @@
+function inferLandFromName(name = '') {
+  const n = String(name).toLowerCase();
+  return /(plains|island|swamp|mountain|forest|tower|land|citadel|temple|garden|sanctum|cavern|delta|strand|mesa|rainforest|foothills|heath|catacomb|crypt|vista|wilds|barrens|moor|panorama|triome|command)/i.test(n);
+}
+
+function createFallbackCard(name) {
+  const inferredLand = inferLandFromName(name);
+  return {
+    name,
+    placeholder: true,
+    type_line: inferredLand ? 'Land' : 'Unknown',
+    cmc: inferredLand ? 0 : null,
+  };
+}
+
 export function buildDeck(cardMap, cardData) {
   const dataMap = new Map();
 
@@ -26,7 +41,7 @@ export function buildDeck(cardMap, cardData) {
       if (card) {
         deck.push({ ...card });
       } else {
-        deck.push({ name, placeholder: true });
+        deck.push(createFallbackCard(name));
         if (i === 0) {
           notFound.push(name);
         }

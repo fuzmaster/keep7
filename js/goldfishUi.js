@@ -79,6 +79,13 @@ export function createGoldfishApp({ getDeck }) {
         title: canPlay ? 'Play this as your land drop' : undefined,
         ariaLabel: card.name,
         onClick: canPlay ? () => { gfState = playLand(gfState, i); render(); } : undefined,
+        onKeydown: canPlay ? e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            gfState = playLand(gfState, i);
+            render();
+          }
+        } : undefined,
         imageSize: 'small',
       });
     });

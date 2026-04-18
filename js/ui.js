@@ -16,9 +16,11 @@ import { openZoom }        from './zoom.js';
 import { getImageUrl, appendCardSlot } from './domUtils.js';
 import { SAMPLE_DECK }     from './sampleDeck.js';
 import { loadRandomWebDeck } from './remoteDeck.js';
+import { showInlineError, clearInlineError, setStatusBanner, setButtonBusy } from './messageUi.js';
 
 const byId = id => document.getElementById(id);
 const ANY_DECK_TYPE = '__any__';
+const FIRST_RUN_KEY = 'keep7_first_run_complete';
 
 function preloadImages(cards) {
   for (const c of cards) {
@@ -27,24 +29,13 @@ function preloadImages(cards) {
   }
 }
 
-// ── Inline error helpers (replaces alert()) ─────────────────────────
-function showInlineError(el, message) {
-  if (!el) return;
-  el.textContent = message;
-  el.classList.remove('hidden');
-}
-function clearInlineError(el) {
-  if (!el) return;
-  el.textContent = '';
-  el.classList.add('hidden');
-}
-
 export function createApp() {
   const inputSection    = byId('input-section');
   const testSection     = byId('test-section');
   const decklistInput   = byId('decklist-input');
   const btnStart        = byId('btn-start');
   const btnSample       = byId('btn-sample');
+  const btnDemoCta      = byId('btn-demo-cta');
   const webDeckType     = byId('web-deck-type');
   const btnWebSample    = byId('btn-web-sample');
   const btnMull         = byId('btn-mull');
@@ -61,6 +52,7 @@ export function createApp() {
   const statsPanel      = byId('stats-panel');
   const handEvalEl      = byId('hand-eval');
   const inputError      = byId('input-error');
+  const handStatus      = byId('hand-status');
 
   let masterDeck    = [];
   let deckState     = null;
@@ -70,6 +62,14 @@ export function createApp() {
   let currentHash   = null;
   let deckLandCount = 0;
   let openerSamples = [];
+
+  function clearStatus() {
+    setStatusBanner(handStatus, '');
+  }
+
+  function showStatus(message, tone = 'info') {
+    setStatusBanner(handStatus, message, tone);
+  }
 
   function clearHint() {
     if (!savedHint) return;
@@ -81,6 +81,35 @@ export function createApp() {
     clearHint();
     savedHint.appendChild(document.createTextNode(message));
     savedHint.classList.remove('hidden');
+  }
+
+  function applyDemoDeckStatus(message = 'Demo deck loaded. Press Try It Now to run your first opener.') {
+    if (decklistInput) {
+      decklistInput.value = SAMPLE_DECK;
+    }
+    clearInlineError(inputError);
+    showStatus(message, 'ok');
+  }
+
+  function maybeBootstrapFirstRun() {
+    const hasSaved = !!loadDecklist();
+    if (hasSaved) return;
+
+    let firstRunDone = false;
+    try {
+      firstRunDone = localStorage.getItem(FIRST_RUN_KEY) === '1';
+    } catch {
+      firstRunDone = false;
+    }
+
+    if (!firstRunDone) {
+      applyDemoDeckStatus('Welcome to Keep7. A demo deck is preloaded so you can test your first hand in one click.');
+      try {
+        localStorage.setItem(FIRST_RUN_KEY, '1');
+      } catch {
+        // Ignore storage failures and keep onboarding non-blocking.
+      }
+    }
   }
 
   function isValidSourceUrl(url) {
@@ -159,7 +188,7 @@ export function createApp() {
         tabIndex: 0,
         ariaLabel: `View ${card.name}`,
         onClick: zoom,
-        onKeydown: e => { if (e.key === 'Enter') zoom(); },
+        onKeydown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zoom(); } },
         lazyLoad,
         imageSize: 'small',
       });
@@ -290,7 +319,10 @@ export function createApp() {
   }
 
   // ── Deal Hand ───────────────────────────────────────────────
-  function dealHand() {
+  function dealHand({ showLoading = false } = {}) {
+    if (showLoading && handContainer) {
+      renderSkeletons(handContainer, 7);
+    }
     deckState   = createDeckState(masterDeck);
     currentHand = draw(deckState, 7);
     handNumber++;
@@ -337,6 +369,7 @@ export function createApp() {
     inputSection?.classList.remove('hidden');
     updateHeader(false);
     handNumber = 0;
+    clearStatus();
     decklistInput?.focus();
   }
 
@@ -349,13 +382,14 @@ export function createApp() {
 
   function trackMulligan() {
     renderStats(evalHand(currentHand));
-    dealHand();
+    dealHand({ showLoading: true });
   }
 
   // ── Load deck ────────────────────────────────────────────────
   async function handleStart() {
     if (loading) return;
     clearInlineError(inputError);
+    clearStatus();
 
     const text = decklistInput?.value?.trim();
     if (!text) {
@@ -365,8 +399,7 @@ export function createApp() {
     }
 
     loading = true;
-    const orig = btnStart.textContent;
-    btnStart.disabled = true;
+    const restoreStart = setButtonBusy(btnStart, true, 'Preparing Hand…');
     btnStart.classList.add('btn-start--loading');
 
     const { cardMap, errors: parseErrors } = parseDecklist(text);
@@ -395,15 +428,23 @@ export function createApp() {
 
     try {
       let cardData = loadCardCacheByHash(hash);
+      let usedScryfallFallback = false;
       if (cardData?.length) {
         btnStart.textContent = 'Loading…';
         renderSkeletons(handContainer, 7);
       } else {
         const names = Array.from(cardMap.keys());
         renderSkeletons(handContainer, 7);
-        cardData = await fetchCards(names, (cur, tot) => {
-          btnStart.textContent = tot > 1 ? `Fetching (${cur}/${tot})…` : 'Fetching…';
-        });
+        try {
+          cardData = await fetchCards(names, (cur, tot) => {
+            btnStart.textContent = tot > 1 ? `Fetching (${cur}/${tot})…` : 'Fetching…';
+          });
+        } catch (fetchErr) {
+          console.warn('Scryfall unavailable, using placeholder-only deck.', fetchErr);
+          cardData = [];
+          usedScryfallFallback = true;
+          showStatus('Scryfall is unavailable right now. Running in name-only mode: images and card details may be limited.', 'warn');
+        }
         saveDecklist(text);
         saveCardCacheByHash(hash, cardData);
       }
@@ -418,7 +459,11 @@ export function createApp() {
       showTest();
       showValidation(deck.length, notFound, parseErrors);
       renderStats(null);
-      dealHand();
+      dealHand({ showLoading: true });
+
+      if (!usedScryfallFallback && cardData?.length) {
+        showStatus('Deck loaded with full card data.', 'ok');
+      }
     } catch (err) {
       console.error('handleStart error', err);
       masterDeck = [];
@@ -432,28 +477,24 @@ export function createApp() {
            : 'Error fetching cards from Scryfall. Please try again.');
       showInlineError(inputError, userMsg + hint);
     } finally {
-      restore();
-      loading = false;
-    }
-
-    function restore() {
-      btnStart.textContent = orig;
-      btnStart.disabled    = false;
+      restoreStart();
       btnStart.classList.remove('btn-start--loading');
+      loading = false;
     }
   }
 
   async function handleRandomWebDeck() {
     if (loading) return;
     loading = true;
-    const orig = btnWebSample?.textContent || 'Random Web Deck';
-    if (btnWebSample) { btnWebSample.disabled = true; btnWebSample.textContent = 'Loading…'; }
+    clearStatus();
+    const restoreWebSample = setButtonBusy(btnWebSample, true, 'Loading…');
     if (btnStart) btnStart.disabled = true;
 
     try {
       const { remote, usedAnyFallback, requestedType } = await loadRandomWebDeckWithFallback();
       if (decklistInput) decklistInput.value = remote.deckText;
       showRemoteDeckHint(remote, { usedAnyFallback, requestedType });
+      showStatus('Random web deck loaded. Press Test Opening Hand to start simulation.', 'ok');
     } catch (err) {
       console.error('handleRandomWebDeck error', err);
       if (decklistInput) decklistInput.value = SAMPLE_DECK;
@@ -461,9 +502,10 @@ export function createApp() {
       showHint(isNetworkError
         ? 'Could not reach web deck source. Loaded local sample deck instead.'
         : 'Web deck unavailable right now. Loaded local sample deck instead.');
+      showStatus('Web deck source failed. Loaded local sample deck fallback.', 'warn');
     } finally {
       loading = false;
-      if (btnWebSample) { btnWebSample.disabled = false; btnWebSample.textContent = orig; }
+      restoreWebSample();
       if (btnStart) btnStart.disabled = false;
     }
   }
@@ -495,12 +537,13 @@ export function createApp() {
 
   function bindEvents() {
     btnStart?.addEventListener('click', handleStart);
-    btnSample?.addEventListener('click', () => { if (decklistInput) decklistInput.value = SAMPLE_DECK; });
+    btnSample?.addEventListener('click', () => applyDemoDeckStatus('Sample deck pasted. Press Try It Now to start.'));
+    btnDemoCta?.addEventListener('click', () => applyDemoDeckStatus());
     btnWebSample?.addEventListener('click', handleRandomWebDeck);
     webDeckType?.addEventListener('change', () => saveWebDeckType(webDeckType.value));
     btnMull?.addEventListener('click', trackMulligan);
     btnKeep?.addEventListener('click', trackKeep);
-    btnReset?.addEventListener('click', dealHand);
+    btnReset?.addEventListener('click', () => dealHand({ showLoading: true }));
 
     // Clear inline error on user typing
     decklistInput?.addEventListener('input', () => clearInlineError(inputError));
@@ -511,6 +554,7 @@ export function createApp() {
       bindEvents();
       restoreWebDeckType();
       restoreSavedDecklist();
+      maybeBootstrapFirstRun();
       renderStats(null);
     },
     getMasterDeck() { return masterDeck; },

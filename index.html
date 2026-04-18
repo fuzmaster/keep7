@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Keep7 – Deck Consistency Lab</title>
-  <meta name="description" content="Test MTG opening hands, goldfish early turns, and compare decks. Free, fast, mobile-first.">
+  <title>Keep7 - MTG Deck Testing for Opening Hands, Goldfish, and Deck Race</title>
+  <meta name="description" content="Keep7 helps you test MTG deck consistency fast: opening hand keeps, turn 1-5 goldfish, and side-by-side deck race simulations in your browser.">
   <meta property="og:title" content="Keep7 – Deck Consistency Lab">
-  <meta property="og:description" content="Opening hand tester, goldfish mode, and deck race. Free, fast, client-side.">
+  <meta property="og:description" content="Browser-based MTG testing: opening hands, goldfish turns, and deck-vs-deck race. Fast, private, client-side.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://keep7.vercel.app">
   <meta name="theme-color" content="#07090f">
   <link rel="icon" href="./favicon-card.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.json">
@@ -33,19 +34,29 @@
       </nav>
       <div id="header-right" class="header-right"></div>
     </header>
+    <p class="mode-nav-hint">Hand Test: evaluate one opener. Goldfish: play turns 1–5. Deck Race: compare two lists quickly.</p>
 
     <div id="mode-handtest" class="mode-panel" role="tabpanel" aria-labelledby="tab-handtest">
       <section id="input-section" class="input-section">
-        <h1 class="hero-headline">Does your deck actually work?</h1>
-        <p class="hero-sub">Paste any MTG decklist and test opening hands in seconds. Track keep rate, land distribution, and draw odds across your whole session.</p>
+        <h1 class="hero-headline">Test your deck before your next game.</h1>
+        <p class="hero-sub">Keep7 answers three practical questions fast: Is this opener keepable? Do I hit land drops by turn 3? Which deck version starts cleaner?</p>
+        <div class="value-strip" aria-label="What Keep7 helps answer">
+          <div class="value-item">Keep vs mull confidence</div>
+          <div class="value-item">Early-turn mana reliability</div>
+          <div class="value-item">Deck A vs Deck B consistency</div>
+        </div>
         <label for="decklist-input" class="sr-only">Paste your decklist</label>
         <textarea id="decklist-input" class="decklist-input"
           placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Lightning Bolt&#10;35 Plains&#10;..."
-          aria-label="Decklist input"></textarea>
+          aria-label="Decklist input"
+          aria-describedby="input-helper"></textarea>
+        <p id="input-helper" class="input-helper">Paste plain text deck lines like: 1 Sol Ring. You can test immediately with a demo deck.</p>
         <div id="input-error" class="input-error hidden" role="alert" aria-live="assertive"></div>
         <div class="input-actions">
-          <button id="btn-sample" class="btn-sample" type="button">Sample deck</button>
-          <label for="web-deck-type" class="sr-only">Web deck type</label>
+          <button id="btn-start" class="btn-start" type="button">Try It Now - Test Opening Hand</button>
+          <button id="btn-demo-cta" class="btn-primary" type="button">Load Demo Deck</button>
+          <button id="btn-sample" class="btn-sample" type="button">Paste Sample</button>
+          <label for="web-deck-type" class="control-label">Web deck type</label>
           <select id="web-deck-type" class="input-select" aria-label="Web deck type filter">
             <option value="Commander Deck" selected>Commander</option>
             <option value="Duel Deck">Duel</option>
@@ -54,8 +65,8 @@
             <option value="__any__">Any Type</option>
           </select>
           <button id="btn-web-sample" class="btn-sample" type="button">Random Web Deck</button>
-          <button id="btn-start" class="btn-start" type="button">Test Opening Hand</button>
         </div>
+        <div id="hand-status" class="status-banner hidden" role="status" aria-live="polite"></div>
         <div id="saved-hint" class="saved-hint hidden"></div>
       </section>
 
@@ -145,7 +156,7 @@
         <div class="race-input-actions">
           <button id="btn-race-compare" class="btn-primary" type="button">Compare Decks</button>
         </div>
-        <div id="race-status" class="race-status hidden"></div>
+        <div id="race-status" class="race-status hidden" role="status" aria-live="polite"></div>
       </div>
       <div id="race-results" class="race-results hidden">
         <div class="race-hands">
@@ -180,6 +191,7 @@
   </div>
 
   <footer class="app-footer" role="contentinfo">
+    <p class="footer-note">Keep7 runs client-side first. Your deck text stays in your browser unless you choose an external deck source.</p>
     <div class="app-footer-links">
       <a class="app-footer-link" href="./about.html">About &amp; Privacy</a>
       <a class="app-footer-link" href="./changelog.html">Changelog</a>

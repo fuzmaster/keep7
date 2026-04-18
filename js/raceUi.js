@@ -6,19 +6,9 @@ import { deckHash }          from './hash.js';
 import { runDeckTrials, generateVerdict } from './race.js';
 import { openZoom }          from './zoom.js';
 import { appendCardSlot }    from './domUtils.js';
+import { showInlineError, clearInlineError, setButtonBusy } from './messageUi.js';
 
 const byId = id => document.getElementById(id);
-
-function showInlineError(el, message) {
-  if (!el) return;
-  el.textContent = message;
-  el.classList.remove('hidden');
-}
-function clearInlineError(el) {
-  if (!el) return;
-  el.textContent = '';
-  el.classList.add('hidden');
-}
 
 export function createRaceApp() {
   const inputEl       = byId('race-input');
@@ -39,11 +29,17 @@ export function createRaceApp() {
   let deckA = null;
   let deckB = null;
 
-  function setStatus(msg, spin = false) {
+  function setStatus(msg, spin = false, tone = 'error') {
     if (!statusEl) return;
     if (!msg) { statusEl.className = 'race-status hidden'; return; }
     statusEl.textContent = msg;
-    statusEl.className = spin ? 'race-status race-status--spin' : 'race-status race-status--err';
+    if (spin) {
+      statusEl.className = 'race-status race-status--spin';
+      return;
+    }
+    statusEl.className = tone === 'warn'
+      ? 'race-status race-status--warn'
+      : 'race-status race-status--err';
   }
 
   async function loadOneDeck(raw, label, onProgress) {
@@ -51,14 +47,21 @@ export function createRaceApp() {
     if (!cardMap.size) throw new Error(`Could not parse ${label} — check the format.`);
     const hash = deckHash(raw);
     let cards  = loadCardCacheByHash(hash);
+    let degraded = false;
     if (!cards) {
       const names = Array.from(cardMap.keys());
-      cards = await fetchCards(names, (c, t) =>
-        onProgress(t > 1 ? `${label}: ${c}/${t}…` : `${label}…`, true));
+      try {
+        cards = await fetchCards(names, (c, t) =>
+          onProgress(t > 1 ? `${label}: ${c}/${t}…` : `${label}…`, true));
+      } catch (err) {
+        console.warn(`${label}: Scryfall unavailable, using placeholder-only cards.`, err);
+        cards = [];
+        degraded = true;
+      }
       saveCardCacheByHash(hash, cards);
     }
     const { deck } = buildDeck(cardMap, cards);
-    return deck;
+    return { deck, degraded };
   }
 
   function renderHand(container, cards) {
@@ -73,6 +76,12 @@ export function createRaceApp() {
         tabIndex: 0,
         ariaLabel: `View ${card.name}`,
         onClick: () => openZoom(card),
+        onKeydown: e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openZoom(card);
+          }
+        },
         imageSize: 'small',
       });
     });
@@ -124,13 +133,17 @@ export function createRaceApp() {
     }
     clearInlineError(raceInputError);
 
-    if (btnCmp) btnCmp.disabled = true;
+    const restoreCompare = setButtonBusy(btnCmp, true, 'Comparing…');
     setStatus('Loading Deck A…', true);
 
     try {
-      deckA = await loadOneDeck(rawA, 'Deck A', setStatus);
+      const a = await loadOneDeck(rawA, 'Deck A', setStatus);
+      deckA = a.deck;
       setStatus('Loading Deck B…', true);
-      deckB = await loadOneDeck(rawB, 'Deck B', setStatus);
+      const b = await loadOneDeck(rawB, 'Deck B', setStatus);
+      deckB = b.deck;
+
+      const degradedMode = a.degraded || b.degraded;
 
       setStatus('Simulating 20 openers each…', true);
       const stA = runDeckTrials(deckA, 20);
@@ -161,7 +174,11 @@ export function createRaceApp() {
       }
 
       dealHands();
-      setStatus(null);
+      if (degradedMode) {
+        setStatus('Scryfall is unavailable. Deck Race ran in name-only mode with limited card detail.', false, 'warn');
+      } else {
+        setStatus(null);
+      }
       inputEl?.classList.add('hidden');
       resultsEl?.classList.remove('hidden');
       resultsEl?.classList.add('fade-in');
@@ -169,7 +186,7 @@ export function createRaceApp() {
       console.error('Race compare error', err);
       setStatus(err.message || 'Network error — check your connection.');
     } finally {
-      if (btnCmp) btnCmp.disabled = false;
+      restoreCompare();
     }
   }
 
@@ -181,6 +198,8 @@ export function createRaceApp() {
         deckA = null; deckB = null;
         resultsEl?.classList.add('hidden');
         inputEl?.classList.remove('hidden');
+        setStatus(null);
+        clearInlineError(raceInputError);
       });
       // Clear error on typing
       textAEl?.addEventListener('input', () => clearInlineError(raceInputError));
