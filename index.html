@@ -13,28 +13,31 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <div id="app">
     <header class="app-header" role="banner">
       <div class="logo" aria-label="Keep7">Keep<span>7</span></div>
-      <nav class="mode-nav" role="tablist" aria-label="App modes">
+      <nav class="mode-nav" role="tablist" aria-label="App modes" id="mode-tablist">
         <button class="mode-tab mode-tab--active" data-mode="handtest"
-                role="tab" aria-selected="true" type="button">Hand Test</button>
+                role="tab" aria-selected="true" aria-controls="mode-handtest"
+                id="tab-handtest" type="button">Hand Test</button>
         <button class="mode-tab" data-mode="goldfish"
-                role="tab" aria-selected="false" type="button">Goldfish</button>
+                role="tab" aria-selected="false" aria-controls="mode-goldfish"
+                id="tab-goldfish" type="button" title="Step through turns 1–5 to see your mana development">Goldfish</button>
         <button class="mode-tab" data-mode="race"
-                role="tab" aria-selected="false" type="button">Deck Race</button>
+                role="tab" aria-selected="false" aria-controls="mode-race"
+                id="tab-race" type="button" title="Compare two decklists across 20 simulated openers">Deck Race</button>
       </nav>
       <div id="header-right" class="header-right"></div>
     </header>
 
-    <div id="mode-handtest" class="mode-panel" role="tabpanel">
+    <div id="mode-handtest" class="mode-panel" role="tabpanel" aria-labelledby="tab-handtest">
       <section id="input-section" class="input-section">
-        <h1 class="hero-headline">Deck Consistency Lab</h1>
-        <p class="hero-sub">Paste your decklist. Draw 7 cards. Know if your mana base holds up.</p>
+        <h1 class="hero-headline">Does your deck actually work?</h1>
+        <p class="hero-sub">Paste any MTG decklist and test opening hands in seconds. Track keep rate, land distribution, and draw odds across your whole session.</p>
         <label for="decklist-input" class="sr-only">Paste your decklist</label>
         <textarea id="decklist-input" class="decklist-input"
           placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Lightning Bolt&#10;35 Plains&#10;..."
@@ -79,11 +82,14 @@
       </div>
     </div><!-- /mode-handtest -->
 
-    <div id="mode-goldfish" class="mode-panel hidden" role="tabpanel">
+    <div id="mode-goldfish" class="mode-panel hidden" role="tabpanel" aria-labelledby="tab-goldfish">
       <div id="gf-idle">
         <div class="mode-idle">
-          <p class="idle-message">Load a deck in <strong>Hand Test</strong> first, then come back to step through turns 1–5.</p>
-          <button class="btn-ghost" id="btn-gf-go-load" type="button">← Go to Hand Test</button>
+          <div class="mode-idle-icon" aria-hidden="true">&#127183;</div>
+          <h2 class="mode-idle-title">Goldfish Mode</h2>
+          <p class="idle-message">Step through turns 1&ndash;5. Play your land drops and see how your mana develops without an opponent.</p>
+          <p class="idle-message idle-message--sub">Load a deck in <strong>Hand Test</strong> first, then come back here.</p>
+          <button class="btn-primary" id="btn-gf-go-load" type="button" style="max-width:200px">&#8592; Go to Hand Test</button>
         </div>
       </div>
       <div id="gf-active" class="hidden">
@@ -120,8 +126,9 @@
       </div>
     </div><!-- /mode-goldfish -->
 
-    <div id="mode-race" class="mode-panel hidden" role="tabpanel">
+    <div id="mode-race" class="mode-panel hidden" role="tabpanel" aria-labelledby="tab-race">
       <div id="race-input">
+        <p class="mode-intro">Paste two decklists and compare their opening hand stats across 20 simulated openers. Useful for choosing between two builds or mana configurations.</p>
         <div class="race-decks">
           <div class="race-deck-col">
             <label class="race-deck-label" for="race-deck-a">Deck A</label>
@@ -174,6 +181,7 @@
 
   <footer class="app-footer" role="contentinfo">
     <div class="app-footer-links">
+      <a class="app-footer-link" href="./about.html">About &amp; Privacy</a>
       <a class="app-footer-link" href="./changelog.html">Changelog</a>
       <a class="app-footer-link" href="https://forms.gle/JVfmheEevuJtwwBH8">Report a bug / request a feature</a>
       <a class="app-footer-link" href="https://www.paypal.com/donate/?hosted_button_id=47A4JJ4WNBY9U">Donate</a>
@@ -183,5 +191,12 @@
   <div id="zoom-modal" class="hidden" role="dialog" aria-modal="true" aria-label="Card zoom"></div>
 
   <script type="module" src="./js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

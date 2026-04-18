@@ -2,17 +2,17 @@
 
 :root {
   --bg-root: #07090f;
-  --bg-surface: #111525;
+  --bg-surface: #0f1424;
   --bg-card: #151b2e;
   --bg-input: #0d1020;
   --bg-elevated: #181f35;
-  --border-faint: #1a1f33;
+  --border-faint: #1e2438;
   --border-subtle: #222840;
   --border-mid: #2d3455;
   --border-focus: #6c5ce7;
   --text-primary: #e9ecf5;
-  --text-secondary: #7c829c;
-  --text-muted: #454d68;
+  --text-secondary: #9198b5;
+  --text-muted: #5a6282;
   --keep: #00d080;
   --keep-dim: rgba(0, 208, 128, 0.15);
   --mull: #f04f4f;
@@ -73,7 +73,7 @@ body {
 
 .app-footer {
   width: 100%;
-  max-width: 520px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 14px 14px calc(22px + var(--safe-b));
   text-align: center;
@@ -105,7 +105,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 14px 0 10px;
-  border-bottom: 1px solid var(--border-faint);
+  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 16px;
 }
 
@@ -118,7 +118,7 @@ body {
   flex-shrink: 0;
 }
 
-.logo span { color: var(--gold); }
+.logo span { color: var(--keep); }
 
 .mode-nav {
   display: flex;
@@ -151,6 +151,17 @@ body {
   background: var(--bg-elevated);
   color: var(--text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+.mode-tab--active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: var(--keep);
+  border-radius: 1px;
 }
 
 .header-right { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
@@ -183,29 +194,29 @@ body {
 .input-section { flex: 1; display: flex; flex-direction: column; }
 
 .hero-headline {
-  font-family: var(--font-display);
-  font-size: 1.28rem;
+  font-family: var(--font-body);
+  font-size: 1.55rem;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
-  margin-bottom: 4px;
-  margin-top: 6px;
+  margin-bottom: 6px;
+  margin-top: 8px;
 }
 
 .hero-sub {
-  font-size: 0.88rem;
+  font-size: 0.93rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 16px;
+  line-height: 1.6;
+  margin-bottom: 18px;
 }
 
 .decklist-input {
   width: 100%;
   min-height: 150px;
   padding: 12px 14px;
-  font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-size: 0.84rem;
   line-height: 1.65;
   background: var(--bg-input);
   color: var(--text-primary);
@@ -264,13 +275,14 @@ body {
   background: var(--keep);
   color: #060a10;
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 0.97rem;
   font-weight: 700;
-  padding: 12px 18px;
+  padding: 13px 20px;
   border: none;
   border-radius: var(--r-md);
   cursor: pointer;
-  transition: all 0.12s;
+  transition: filter 0.12s, transform 0.1s;
+  letter-spacing: 0.01em;
 }
 
 .btn-primary:hover,
@@ -712,7 +724,7 @@ body {
   color: var(--text-secondary);
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--border-faint);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .race-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
@@ -844,7 +856,7 @@ body {
     margin-bottom: 22px;
   }
   .hero-headline { font-size: 1.8rem; }
-  .hero-sub { font-size: 1rem; max-width: 520px; }
+  .hero-sub { font-size: 1rem; max-width: 800px; }
   .decklist-input { min-height: 200px; }
 
   /* Responsive card grids on desktop */
@@ -908,4 +920,249 @@ textarea:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--keep);
   outline-offset: 2px;
+}
+
+/* =====================================================================
+   AUDIT v2 FIXES
+   ===================================================================== */
+
+/* Larger, clearer tab targets */
+.mode-tab {
+  min-height: 38px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+}
+
+/* Stronger active state */
+.mode-tab--active {
+  color: var(--text-primary) !important;
+  border-bottom-width: 2px;
+}
+
+/* Improved secondary text contrast — minimum ~4.5:1 on dark bg */
+.hero-sub {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+/* Make "Openers" stat chip readable, not faint-disabled-looking */
+.stat-chip--faint .stat-value {
+  color: var(--text-secondary);
+}
+.stat-chip--faint .stat-label {
+  color: var(--text-muted);
+}
+
+/* Desktop: place deck input and stats side-by-side when wide enough */
+@media (min-width: 900px) {
+  .input-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: 32px;
+    align-items: start;
+  }
+  .hero-headline  { grid-column: 1 / -1; }
+  .hero-sub       { grid-column: 1 / -1; }
+  .decklist-input { grid-row: 3; min-height: 220px; }
+  .input-actions  { grid-row: 4; }
+  #input-error    { grid-column: 1 / -1; }
+  #saved-hint     { grid-column: 1 / -1; }
+}
+
+/* sitemap: add a small "How to use" tooltip-style hint below tabs */
+.mode-nav-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  padding: 0 0 6px;
+  display: none;
+}
+@media (min-width: 640px) {
+  .mode-nav-hint { display: block; }
+}
+
+/* =====================================================================
+   VISUAL OVERHAUL — audit v2 continued
+   ===================================================================== */
+
+/* Goldfish idle — proper onboarding state */
+.mode-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 52px 24px 48px;
+  text-align: center;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.mode-idle-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: grayscale(0.2);
+}
+
+.mode-idle-title {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.idle-message {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+.idle-message--sub {
+  font-size: 0.80rem;
+  color: var(--text-muted);
+}
+
+/* Deck Race — mode description */
+.mode-intro {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  border-left: 3px solid var(--purple);
+  border-radius: var(--r-sm);
+}
+
+/* Input area visual separation */
+.input-section {
+  padding-top: 4px;
+}
+
+/* Better button group alignment — primary CTA visually dominant */
+.input-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.input-actions .btn-sample,
+.input-actions .input-select {
+  flex: 0 0 auto;
+}
+
+.input-actions .btn-start {
+  flex: 1 1 160px;
+  min-width: 160px;
+}
+
+/* Footer — horizontal on all but very small screens */
+.app-footer-links {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+}
+
+.app-footer-link {
+  color: var(--text-muted);
+  font-size: 0.80rem;
+}
+
+/* Roadmap section hidden (already removed from HTML but keep rule for safety) */
+.roadmap-section { display: none !important; }
+
+/* Stats panel — make primary stats more prominent */
+.stat-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.56rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Keep/Mull buttons — add subtle text reinforcement */
+.btn-mull::before { content: "✕ "; opacity: 0.7; font-size: 0.8em; }
+.btn-keep::before { content: "✓ "; opacity: 0.7; font-size: 0.8em; }
+
+/* Validation banner — cleaner */
+.validation-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  font-size: 0.80rem;
+  margin-top: 10px;
+}
+
+/* Hand eval badge — sharper */
+.heval-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+.heval-badge--keep { background: var(--keep-dim); color: var(--keep); }
+.heval-badge--gold { background: var(--gold-dim); color: var(--gold); }
+.heval-badge--mull { background: var(--mull-dim); color: var(--mull); }
+.heval-badge--muted { background: var(--bg-surface); color: var(--text-muted); }
+
+.heval-detail {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.heval-est {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Draws divider */
+.draws-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 8px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.draws-divider::before,
+.draws-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-faint);
 }

@@ -423,13 +423,14 @@ export function createApp() {
       console.error('handleStart error', err);
       masterDeck = [];
       const isFileProtocol = window.location.protocol === 'file:';
-      const isNetworkError = err?.name === 'TypeError' || err?.name === 'AbortError';
-      const hint = isFileProtocol ? ' Run this app from a local web server (not file://).' : '';
-      showInlineError(inputError,
-        isNetworkError
-          ? `Could not reach Scryfall. Check your internet connection and try again.${hint}`
-          : `Error fetching cards from Scryfall. Please try again.${hint}`
-      );
+      const hint = isFileProtocol ? ' (Run from a local web server, not file://.)' : '';
+      const userMsg = err?.userMessage ||
+        (err?.code === 'RATE_LIMITED' ? 'Scryfall rate limit reached — wait a moment and try again.' :
+         err?.code === 'SERVER_ERROR' ? 'Scryfall is having issues right now. Try again in a minute.' :
+         err?.name === 'TypeError' || err?.name === 'AbortError'
+           ? 'Could not reach Scryfall. Check your connection or disable VPN/ad-blockers.'
+           : 'Error fetching cards from Scryfall. Please try again.');
+      showInlineError(inputError, userMsg + hint);
     } finally {
       restore();
       loading = false;

@@ -28,8 +28,17 @@ async function fetchChunk(names, retries = MAX_RETRIES) {
       });
 
       if (!response.ok) {
-        const err = new Error(`Scryfall request failed with ${response.status}`);
+        const err = new Error(
+          response.status === 429
+            ? 'Scryfall rate limit reached. Wait a moment and try again.'
+            : response.status >= 500
+              ? `Scryfall is having issues (HTTP ${response.status}). Try again in a minute.`
+              : `Scryfall request failed (HTTP ${response.status}).`
+        );
         err.status = response.status;
+        err.code = response.status === 429 ? 'RATE_LIMITED'
+                 : response.status >= 500  ? 'SERVER_ERROR'
+                 : 'HTTP_ERROR';
 
         // Retry transient API/rate-limit errors.
         if ((response.status === 429 || response.status >= 500) && attempt < retries) {
@@ -43,6 +52,9 @@ async function fetchChunk(names, retries = MAX_RETRIES) {
 
       return await response.json();
     } catch (err) {
+      // Annotate network/abort errors with a user-friendly code
+      if (err?.name === 'AbortError') { err.code = 'TIMEOUT'; err.userMessage = 'Request timed out — check your connection.'; }
+      if (err?.name === 'TypeError')  { err.code = 'NETWORK'; err.userMessage = 'Could not reach Scryfall — check your internet or disable VPN/ad-blockers.'; }
       lastError = err;
 
       // Retry network and timeout failures.

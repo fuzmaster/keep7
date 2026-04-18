@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About – Keep7</title>
+  <link rel="icon" href="./favicon-card.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .about-wrap { max-width: 680px; margin: 0 auto; padding: 32px 20px 80px; }
+    .about-back  { display: inline-block; margin-bottom: 28px; color: var(--text-secondary); font-size: 0.85rem; text-decoration: none; }
+    .about-back:hover { color: var(--text-primary); }
+    .about-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--keep); margin-bottom: 28px; }
+    .about-h2 { font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin: 32px 0 10px; }
+    .about-p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .about-list { margin: 0 0 12px 0; padding-left: 18px; }
+    .about-list li { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 4px; }
+    .about-link { color: var(--keep); text-decoration: none; }
+    .about-link:hover { text-decoration: underline; }
+    .about-rule { border: none; border-top: 1px solid var(--border-faint); margin: 32px 0; }
+  </style>
+</head>
+<body>
+  <div class="about-wrap">
+    <a class="about-back" href="./index.html">← Back to Keep7</a>
+    <h1 class="about-title">About Keep7</h1>
+
+    <h2 class="about-h2">What is Keep7?</h2>
+    <p class="about-p">Keep7 is a free, browser-based tool for Magic: The Gathering players who want to test how their decks actually perform. Paste a decklist, draw opening hands, keep or mulligan, and see your stats build up over a session.</p>
+    <p class="about-p">There are three modes:</p>
+    <ul class="about-list">
+      <li><strong>Hand Test</strong> — Draw a 7-card opener. Keep or Mulligan. See land count, keep-rate and draw odds update in real time.</li>
+      <li><strong>Goldfish</strong> — Step through turns 1–5. Play land drops and track how your mana develops.</li>
+      <li><strong>Deck Race</strong> — Compare two decklists side-by-side across 20 simulated openers. Useful for choosing between two builds.</li>
+    </ul>
+
+    <h2 class="about-h2">How it works</h2>
+    <p class="about-p">Keep7 runs entirely in your browser. When you paste a decklist and click "Test Opening Hand", the app calls the <a class="about-link" href="https://scryfall.com/docs/api" target="_blank" rel="noopener">Scryfall API</a> to fetch card data and images. That data is cached locally in your browser so subsequent sessions with the same deck are instant.</p>
+    <p class="about-p">All shuffling and simulation is done client-side using the Fisher-Yates algorithm. No data leaves your browser beyond the Scryfall card name lookup.</p>
+
+    <h2 class="about-h2">Understanding the metrics</h2>
+    <ul class="about-list">
+      <li><strong>Keep Rate</strong> — What percentage of your opening hands you chose to keep.</li>
+      <li><strong>Avg Lands</strong> — The average number of lands across all opening hands drawn this session.</li>
+      <li><strong>2-Land % / 3-Land %</strong> — How often your opener had exactly 2 or 3 lands.</li>
+      <li><strong>T3 Land ~%</strong> — Estimated probability (hypergeometric) that you'll draw at least one more land in the next 3 draws, given the lands left in your deck.</li>
+      <li><strong>Flood Risk / Screw Risk</strong> — (Deck Race) Percentage of simulated hands with 6+ lands (flood) or 0–1 lands (screw).</li>
+    </ul>
+
+    <hr class="about-rule">
+
+    <h2 class="about-h2">Privacy</h2>
+    <p class="about-p">Keep7 does not collect, store, or transmit any personal data. There are no accounts, no analytics, and no tracking cookies.</p>
+    <p class="about-p">The only external requests made are:</p>
+    <ul class="about-list">
+      <li><strong>Scryfall API</strong> (api.scryfall.com) — to look up card names and images. Card names are sent as part of a POST request. No personal information is included.</li>
+      <li><strong>MTGJSON</strong> (mtgjson.com) — to fetch random prebuilt decklists when you use "Random Web Deck". No personal information is sent.</li>
+      <li><strong>Google Fonts</strong> — to load the Space Mono and DM Sans typefaces.</li>
+    </ul>
+    <p class="about-p">Decklist text and card cache data are stored in your browser's <code>localStorage</code> and are never sent to any server operated by Keep7.</p>
+
+    <hr class="about-rule">
+
+    <h2 class="about-h2">Contact &amp; feedback</h2>
+    <p class="about-p">Found a bug or have a feature request? <a class="about-link" href="https://forms.gle/JVfmheEevuJtwwBH8" target="_blank" rel="noopener">Submit feedback here.</a></p>
+    <p class="about-p">If Keep7 saves you time, consider <a class="about-link" href="https://www.paypal.com/donate/?hosted_button_id=47A4JJ4WNBY9U" target="_blank" rel="noopener">supporting the project</a>.</p>
+  </div>
+</body>
+</html>
