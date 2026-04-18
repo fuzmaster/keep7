@@ -7,12 +7,31 @@ const MAX_DECKS     = 5;
 
 const ls = {
   get: k    => { try { return localStorage.getItem(k);    } catch { return null; } },
-  set: (k,v)=> { try { localStorage.setItem(k, v);        } catch {} },
+  set: (k,v)=> { 
+    try { 
+      localStorage.setItem(k, v);
+    } catch (e) {
+      if (e.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, clearing oldest cache');
+        clearOldestCache();
+        try { localStorage.setItem(k, v); } catch {}
+      }
+    }
+  },
   del: k    => { try { localStorage.removeItem(k);        } catch {} },
 };
 
 function getIdx()    { try { return JSON.parse(ls.get(KEY_CACHE_IDX) || '[]'); } catch { return []; } }
 function setIdx(arr) { ls.set(KEY_CACHE_IDX, JSON.stringify(arr)); }
+
+function clearOldestCache() {
+  const idx = getIdx();
+  if (idx.length > 0) {
+    const oldest = idx.shift();
+    ls.del(KEY_CACHE_PFX + oldest);
+    setIdx(idx);
+  }
+}
 
 export function saveDecklist(text) { ls.set(KEY_DECKLIST, text); }
 export function loadDecklist()     { return ls.get(KEY_DECKLIST); }

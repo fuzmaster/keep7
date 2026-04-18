@@ -1,5 +1,7 @@
 export function getImageUrl(card, size = 'small') {
-  const uris = card.image_uris || card.card_faces?.[0]?.image_uris;
+  if (!card) return null;
+  const uris = card.image_uris || 
+    (Array.isArray(card.card_faces) && card.card_faces[0]?.image_uris);
   return uris ? uris[size] || uris.small || uris.normal || null : null;
 }
 

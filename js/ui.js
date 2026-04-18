@@ -70,21 +70,35 @@ export function createApp() {
     savedHint.classList.remove('hidden');
   }
 
+  function isValidSourceUrl(url) {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  }
+
   function showRemoteDeckHint(remote, { usedAnyFallback = false, requestedType = '' } = {}) {
-    if (!savedHint) return;
+    if (!savedHint || !remote) return;
     clearHint();
 
+    const deckType = remote.deckType || 'Unknown';
+    const deckName = remote.deckName || 'Deck';
     const leadText = usedAnyFallback
-      ? `No ${requestedType} decks available right now. Loaded ${remote.deckType}: ${remote.deckName}. `
-      : `Loaded ${remote.deckType}: ${remote.deckName}. `;
+      ? `No ${requestedType} decks available right now. Loaded ${deckType}: ${deckName}. `
+      : `Loaded ${deckType}: ${deckName}. `;
     const lead = document.createTextNode(leadText);
     savedHint.appendChild(lead);
 
     const link = document.createElement('a');
-    link.href = remote.sourceUrl;
+    if (remote.sourceUrl && isValidSourceUrl(remote.sourceUrl)) {
+      link.href = remote.sourceUrl;
+    }
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     link.textContent = 'Source';
+    if (!link.href) link.style.pointerEvents = 'none';
     savedHint.appendChild(link);
 
     savedHint.appendChild(document.createTextNode(' · '));
@@ -175,21 +189,44 @@ export function createApp() {
   function renderStats(ev) {
     if (!statsPanel) return;
     const s = computeSessionStats(openerSamples);
-    statsPanel.innerHTML = `
-      <div class="stat-chip"><span class="stat-label">Keep Rate</span><span class="stat-value">${s.keepRate}%</span></div>
-      <div class="stat-chip"><span class="stat-label">K / M</span><span class="stat-value">${s.keeps} / ${s.mulls}</span></div>
-      <div class="stat-chip"><span class="stat-label">Avg Lands</span><span class="stat-value">${s.avgLands}</span></div>
-      <div class="stat-chip"><span class="stat-label">2-Land %</span><span class="stat-value">${s.twoLandPct}%</span></div>
-      <div class="stat-chip"><span class="stat-label">3-Land %</span><span class="stat-value">${s.threeLandPct}%</span></div>
-      <div class="stat-chip stat-chip--faint"><span class="stat-label">Openers</span><span class="stat-value">${s.openers}</span></div>
-    `;
+    statsPanel.innerHTML = '';
+    const stats = [
+      { label: 'Keep Rate', value: `${s.keepRate}%` },
+      { label: 'K / M', value: `${s.keeps} / ${s.mulls}` },
+      { label: 'Avg Lands', value: s.avgLands },
+      { label: '2-Land %', value: `${s.twoLandPct}%` },
+      { label: '3-Land %', value: `${s.threeLandPct}%` },
+      { label: 'Openers', value: s.openers, faint: true },
+    ];
+    stats.forEach(stat => {
+      const chip = document.createElement('div');
+      chip.className = 'stat-chip' + (stat.faint ? ' stat-chip--faint' : '');
+      const label = document.createElement('span');
+      label.className = 'stat-label';
+      label.textContent = stat.label;
+      const value = document.createElement('span');
+      value.className = 'stat-value';
+      value.textContent = stat.value;
+      chip.appendChild(label);
+      chip.appendChild(value);
+      statsPanel.appendChild(chip);
+    });
     if (handEvalEl && ev) {
       const lbl = keepLabel(ev);
       const t3  = pLandInDraws(deckLandCount - ev.landCount, masterDeck.length - 7, 3);
-      handEvalEl.innerHTML = `
-        <span class="heval-badge heval-badge--${lbl.cls}">${lbl.text}</span>
-        <span class="heval-detail">${ev.landCount} lands · T3 land ~${t3}% <span class="heval-est">est.</span></span>
-      `;
+      handEvalEl.innerHTML = '';
+      const badge = document.createElement('span');
+      badge.className = `heval-badge heval-badge--${lbl.cls}`;
+      badge.textContent = lbl.text;
+      const detail = document.createElement('span');
+      detail.className = 'heval-detail';
+      detail.textContent = `${ev.landCount} lands · T3 land ~${t3}% `;
+      const est = document.createElement('span');
+      est.className = 'heval-est';
+      est.textContent = 'est.';
+      detail.appendChild(est);
+      handEvalEl.appendChild(badge);
+      handEvalEl.appendChild(detail);
       handEvalEl.className = 'hand-eval hand-eval--visible';
     } else if (handEvalEl) {
       handEvalEl.className = 'hand-eval';
@@ -198,10 +235,11 @@ export function createApp() {
   }
 
   // ── Validation ──────────────────────────────────────────────
+  const VALID_DECK_SIZES = [40, 60, 99, 100];
   function showValidation(deckSize, notFound, parseErrors) {
     if (!validationBanner) return;
     let html = `<span class="vb-ok">${deckSize} cards loaded</span>`;
-    if (deckSize !== 100 && deckSize !== 60 && deckSize !== 99 && deckSize !== 40) {
+    if (!VALID_DECK_SIZES.includes(deckSize)) {
       html += ` <span class="vb-warn">· unusual size</span>`;
     }
     if (notFound.length) {
@@ -312,6 +350,20 @@ export function createApp() {
       restore();
       loading = false;
       alert('Could not parse any cards.\n\nExpected:\n1 Sol Ring\n4 Lightning Bolt');
+      return;
+    }
+
+    const totalCards = Array.from(cardMap.values()).reduce((a, b) => a + b, 0);
+    if (totalCards === 0) {
+      restore();
+      loading = false;
+      alert('Deck cannot be empty.');
+      return;
+    }
+    if (totalCards > 500) {
+      restore();
+      loading = false;
+      alert('Deck exceeds reasonable size limit (500 cards).');
       return;
     }
 

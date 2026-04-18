@@ -9,13 +9,24 @@ function normalizeCardName(rawName) {
     .trim();
 
   // Keep only the literal card name by cutting at the first set/annotation delimiter.
-  name = name.split(/[\[(]/, 1)[0].trim();
+  // Limit splits to prevent DoS from massively nested inputs
+  const parts = name.split(/[\[(]/, 1);
+  name = parts[0].trim();
+
+  // For double-faced cards, limit to 2 parts
+  if (name.includes('//')) {
+    const faceParts = name.split('//').slice(0, 2);
+    name = faceParts[0].trim();
+  }
 
   return name;
 }
 
 export function getFrontFaceName(name) {
-  return name.includes('//') ? name.split('//')[0].trim() : name;
+  if (!name.includes('//')) return name;
+  // Limit splits to first two parts to prevent DoS
+  const parts = name.split('//').slice(0, 2);
+  return parts[0].trim();
 }
 
 export function parseDecklist(text) {

@@ -109,10 +109,21 @@ export function createRaceApp() {
 
       if (verdictEl) {
         const lines = generateVerdict(stA, stB);
-        verdictEl.innerHTML =
-          '<div class="verdict-head">Analysis</div>' +
-          lines.map(l => `<div class="verdict-line">· ${l}</div>`).join('') +
-          '<div class="verdict-note">Heuristic — based on 20 simulated openers per deck</div>';
+        verdictEl.innerHTML = '';
+        const head = document.createElement('div');
+        head.className = 'verdict-head';
+        head.textContent = 'Analysis';
+        verdictEl.appendChild(head);
+        lines.forEach(l => {
+          const line = document.createElement('div');
+          line.className = 'verdict-line';
+          line.textContent = `· ${l}`;
+          verdictEl.appendChild(line);
+        });
+        const note = document.createElement('div');
+        note.className = 'verdict-note';
+        note.textContent = 'Heuristic — based on 20 simulated openers per deck';
+        verdictEl.appendChild(note);
       }
 
       dealHands();

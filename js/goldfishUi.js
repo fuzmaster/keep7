@@ -66,7 +66,7 @@ export function createGoldfishApp({ getDeck }) {
 
     cards.forEach((card, i) => {
       const land      = isLand(card);
-      const isCastable = castableFlags[i];
+      const isCastable = castableFlags && castableFlags[i] ? true : false;
       const canPlay   = land && interactive && !gfState.landPlayedThisTurn;
 
       appendCardSlot(container, card, {

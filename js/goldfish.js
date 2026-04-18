@@ -8,12 +8,11 @@ export function createGoldfishState(masterDeck) {
 }
 
 export function playLand(gf, cardIndex) {
-  if (gf.landPlayedThisTurn) return gf;
+  if (gf.landPlayedThisTurn || cardIndex < 0 || cardIndex >= gf.hand.length) return gf;
   const card = gf.hand[cardIndex];
   if (!card || !isLand(card)) return gf;
 
-  const hand = [...gf.hand];
-  hand.splice(cardIndex, 1);
+  const hand = gf.hand.filter((_, i) => i !== cardIndex);
   return { ...gf, hand, battlefield: [...gf.battlefield, card], landPlayedThisTurn: true };
 }
 
