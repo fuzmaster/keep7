@@ -30,18 +30,19 @@
   outline-offset: 2px;
 }
 
-/* Highlight states */
+/* Highlight states — mana-color coded */
 .playable {
-  box-shadow: 0 0 0 2px var(--keep), 0 0 12px rgba(0, 208, 128, 0.3);
+  box-shadow: 0 0 0 2px var(--mana-green), 0 0 14px rgba(26, 122, 71, 0.5);
 }
 
 .castable {
-  box-shadow: 0 0 0 2px var(--purple), 0 0 12px rgba(108, 92, 231, 0.3);
+  box-shadow: 0 0 0 2px var(--mana-blue), 0 0 14px rgba(30, 110, 170, 0.5);
 }
 
 .tapped {
-  opacity: 0.5;
+  opacity: 0.55;
   transform: rotate(6deg);
+  filter: brightness(0.8);
 }
 
 /* Skeleton */
@@ -60,8 +61,9 @@
   height: 100%;
   padding: 0.75rem;
   text-align: center;
-  background: linear-gradient(160deg, var(--bg-elevated), var(--bg-card));
-  border: 1px dashed var(--border-mid);
+  background: linear-gradient(160deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-mid);
+  border-top-color: rgba(201, 168, 76, 0.2);
   border-radius: 8px;
 }
 

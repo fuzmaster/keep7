@@ -11,6 +11,7 @@ interface DeckInputProps {
   value: string;
   onChange: (text: string) => void;
   onSubmit: (text?: string) => void;
+  onLoadDemo: () => void;
   loading: boolean;
   error: string | null;
 }
@@ -23,7 +24,7 @@ const DECK_TYPES = [
   { value: '__any__', label: 'Any Type' },
 ];
 
-export function DeckInput({ value, onChange, onSubmit, loading, error }: DeckInputProps) {
+export function DeckInput({ value, onChange, onSubmit, onLoadDemo, loading, error }: DeckInputProps) {
   const [webDeckType, setWebDeckType] = useState(loadWebDeckType() ?? 'Commander Deck');
   const [webLoading, setWebLoading] = useState(false);
   const [webError, setWebError] = useState<string | null>(null);
@@ -55,8 +56,25 @@ export function DeckInput({ value, onChange, onSubmit, loading, error }: DeckInp
     saveWebDeckType(v);
   }, []);
 
+  const isEmpty = !value.trim();
+
   return (
     <div className={styles.container}>
+      {isEmpty && (
+        <div className={styles.quickStart}>
+          <div className={styles.quickStartText}>
+            <strong>New here?</strong> Try it with a sample deck — no account needed.
+          </div>
+          <button
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={onLoadDemo}
+            disabled={loading}
+          >
+            Try demo deck →
+          </button>
+        </div>
+      )}
+
       <UrlImporter onImport={handleUrlImport} />
 
       <div className={styles.divider}>
@@ -101,23 +119,26 @@ export function DeckInput({ value, onChange, onSubmit, loading, error }: DeckInp
       </div>
 
       <div className={styles.webDeckRow}>
-        <select
-          className={styles.select}
-          value={webDeckType}
-          onChange={e => handleTypeChange(e.target.value)}
-          aria-label="Random deck type"
-        >
-          {DECK_TYPES.map(dt => (
-            <option key={dt.value} value={dt.value}>{dt.label}</option>
-          ))}
-        </select>
-        <button
-          className={styles.btn}
-          onClick={handleWebDeck}
-          disabled={webLoading || loading}
-        >
-          {webLoading ? 'Fetching…' : 'Random Web Deck'}
-        </button>
+        <label className={styles.webDeckLabel} htmlFor="web-deck-type">Random deck type</label>
+        <div className={styles.webDeckControls}>
+          <select
+            id="web-deck-type"
+            className={styles.select}
+            value={webDeckType}
+            onChange={e => handleTypeChange(e.target.value)}
+          >
+            {DECK_TYPES.map(dt => (
+              <option key={dt.value} value={dt.value}>{dt.label}</option>
+            ))}
+          </select>
+          <button
+            className={styles.btn}
+            onClick={handleWebDeck}
+            disabled={webLoading || loading}
+          >
+            {webLoading ? 'Fetching…' : 'Load Random Web Deck'}
+          </button>
+        </div>
       </div>
       {webError && <div className={styles.error}>{webError}</div>}
     </div>

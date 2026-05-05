@@ -1,5 +1,13 @@
 import type { Metadata } from 'next';
+import { Cinzel } from 'next/font/google';
 import './globals.css';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Keep7 — MTG Deck Consistency Lab',
@@ -19,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cinzel.variable}>
       <body>{children}</body>
     </html>
   );

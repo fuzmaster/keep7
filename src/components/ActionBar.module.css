@@ -40,16 +40,27 @@
 .btnMull {
   background: var(--mull);
   color: #fff;
+  box-shadow: var(--glow-mull);
+}
+
+.btnMull:hover {
+  box-shadow: 0 0 20px rgba(224, 60, 60, 0.45);
 }
 
 .btnKeep {
   background: var(--keep);
   color: #07090f;
+  box-shadow: var(--glow-keep);
+}
+
+.btnKeep:hover {
+  box-shadow: 0 0 20px rgba(0, 200, 119, 0.45);
 }
 
 .btnNew {
-  background: var(--purple);
-  color: #fff;
+  background: var(--gold);
+  color: #07090f;
+  box-shadow: var(--glow-gold);
 }
 
 .btnReset {

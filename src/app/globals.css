@@ -1,27 +1,48 @@
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
+  /* Backgrounds — deep navy, MTG Arena-coded */
   --bg-root: #07090f;
-  --bg-surface: #0f1424;
-  --bg-card: #151b2e;
-  --bg-input: #0d1020;
-  --bg-elevated: #181f35;
+  --bg-surface: #0c1020;
+  --bg-card: #131826;
+  --bg-input: #0a0e1c;
+  --bg-elevated: #161e30;
 
-  --text-primary: #e9ecf5;
-  --text-secondary: #9198b5;
-  --text-muted: #5a6282;
+  /* Text */
+  --text-primary: #eceef8;
+  --text-secondary: #8892b8;
+  --text-muted: #505878;
 
-  --keep: #00d080;
-  --keep-dim: rgba(0, 208, 128, 0.15);
-  --mull: #f04f4f;
-  --mull-dim: rgba(240, 79, 79, 0.15);
-  --gold: #e8b836;
-  --gold-dim: rgba(232, 184, 54, 0.15);
-  --purple: #6c5ce7;
+  /* Semantic: green = keep, red = mull — matches MTG color philosophy */
+  --keep: #00c877;
+  --keep-dim: rgba(0, 200, 119, 0.12);
+  --mull: #e03c3c;
+  --mull-dim: rgba(224, 60, 60, 0.12);
 
-  --border-faint: #1e2438;
-  --border-subtle: #222840;
-  --border-mid: #2d3455;
-  --border-focus: #6c5ce7;
+  /* Gold — MTG card-frame amber, warmer than warning yellow */
+  --gold: #c9a84c;
+  --gold-bright: #e2c468;
+  --gold-dim: rgba(201, 168, 76, 0.12);
+
+  /* MTG mana palette — used for card highlight states */
+  --mana-white: #f0e6c0;
+  --mana-blue: #1e6eaa;
+  --mana-black: #3d2b5e;
+  --mana-red: #cc3b28;
+  --mana-green: #1a7a47;
+
+  /* Borders */
+  --border-faint: #181f38;
+  --border-subtle: #1f2842;
+  --border-mid: #293356;
+  --border-focus: #c9a84c;   /* gold focus — replaces purple */
+
+  /* Glow effects — MTG Arena interactive signature */
+  --glow-gold: 0 0 14px rgba(201, 168, 76, 0.22), 0 0 4px rgba(201, 168, 76, 0.12);
+  --glow-keep: 0 0 12px rgba(0, 200, 119, 0.25);
+  --glow-mull: 0 0 12px rgba(224, 60, 60, 0.25);
+
+  /* Display font — Cinzel (Beleren-adjacent serif for logo/headings) */
+  --font-display: 'Cinzel', serif;
 }
 
 /* ── Reset ────────────────────────────────────────────── */
