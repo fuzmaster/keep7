@@ -1,27 +1,31 @@
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
-  --bg-root: #07090f;
-  --bg-surface: #0f1424;
-  --bg-card: #151b2e;
-  --bg-input: #0d1020;
-  --bg-elevated: #181f35;
+  --font-display: "Trebuchet MS", "Avenir Next Condensed", "Segoe UI", sans-serif;
+  --font-mono: "Consolas", "Courier New", monospace;
+  --bg-root: #08110f;
+  --bg-surface: rgba(16, 28, 24, 0.92);
+  --bg-card: #16231f;
+  --bg-input: #0d1815;
+  --bg-elevated: #1d2d28;
 
-  --text-primary: #e9ecf5;
-  --text-secondary: #9198b5;
-  --text-muted: #5a6282;
+  --text-primary: #f2f1e7;
+  --text-secondary: #c7c1a5;
+  --text-muted: #8f947e;
 
-  --keep: #00d080;
-  --keep-dim: rgba(0, 208, 128, 0.15);
-  --mull: #f04f4f;
-  --mull-dim: rgba(240, 79, 79, 0.15);
-  --gold: #e8b836;
-  --gold-dim: rgba(232, 184, 54, 0.15);
-  --purple: #6c5ce7;
+  --keep: #73d892;
+  --keep-dim: rgba(115, 216, 146, 0.16);
+  --mull: #e16757;
+  --mull-dim: rgba(225, 103, 87, 0.16);
+  --gold: #dfb657;
+  --gold-dim: rgba(223, 182, 87, 0.18);
+  --purple: #8b79ff;
 
-  --border-faint: #1e2438;
-  --border-subtle: #222840;
-  --border-mid: #2d3455;
-  --border-focus: #6c5ce7;
+  --border-faint: rgba(196, 170, 111, 0.14);
+  --border-subtle: rgba(196, 170, 111, 0.24);
+  --border-mid: rgba(223, 182, 87, 0.42);
+  --border-focus: #dfb657;
+  --shadow-card: 0 14px 30px rgba(0, 0, 0, 0.28);
+  --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.34);
 }
 
 /* ── Reset ────────────────────────────────────────────── */
@@ -37,12 +41,15 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-root);
+  background-image:
+    radial-gradient(circle at top, rgba(115, 216, 146, 0.1), transparent 28%),
+    linear-gradient(180deg, #10201b 0%, #08110f 24%, #08110f 100%);
   color: var(--text-primary);
   line-height: 1.5;
   min-height: 100dvh;
+  font-size: 16px;
 }
 
 img {
@@ -52,6 +59,10 @@ img {
 
 button, input, select, textarea {
   font: inherit;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 /* ── Accessibility ────────────────────────────────────── */

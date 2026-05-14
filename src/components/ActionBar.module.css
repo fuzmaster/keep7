@@ -4,28 +4,34 @@
   left: 0;
   right: 0;
   display: flex;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-faint);
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  padding-bottom: calc(0.8rem + env(safe-area-inset-bottom, 0px));
+  background:
+    linear-gradient(180deg, rgba(20, 31, 27, 0.96), rgba(8, 15, 12, 0.98));
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: 0 -16px 36px rgba(0, 0, 0, 0.3);
   z-index: 90;
   align-items: center;
+  backdrop-filter: blur(12px);
 }
 
 .btn {
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  flex: 1 1 132px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  font-size: 0.98rem;
+  font-weight: 700;
   cursor: pointer;
-  min-height: 42px;
-  transition: opacity 0.12s, transform 0.12s;
+  min-height: 54px;
+  transition: opacity 0.12s, transform 0.12s, box-shadow 0.12s;
+  box-shadow: var(--shadow-card);
 }
 
 .btn:hover {
-  opacity: 0.85;
+  opacity: 0.94;
 }
 
 .btn:active {
@@ -38,38 +44,53 @@
 }
 
 .btnMull {
-  background: var(--mull);
+  background: linear-gradient(180deg, #f07c69, #ce5849);
   color: #fff;
 }
 
 .btnKeep {
-  background: var(--keep);
-  color: #07090f;
+  background: linear-gradient(180deg, #8ceaab, #59c879);
+  color: #07110d;
 }
 
 .btnNew {
-  background: var(--purple);
+  background: linear-gradient(180deg, #9f92ff, #7664ea);
   color: #fff;
 }
 
 .btnReset {
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
   border: 1px solid var(--border-subtle);
-  margin-left: auto;
+  flex-basis: 100%;
 }
 
 .counter {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  width: 100%;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
   white-space: nowrap;
 }
 
 @media (min-width: 1024px) {
   .bar {
     position: sticky;
-    border-radius: 10px;
+    border-radius: 16px;
     margin-top: 0.75rem;
-    border: 1px solid var(--border-faint);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .btnReset {
+    flex: 0 1 auto;
+    margin-left: auto;
+  }
+
+  .counter {
+    width: auto;
   }
 }
