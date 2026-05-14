@@ -8,13 +8,12 @@ const BASIC_COLOR_MAP: Record<string, keyof ManaPool> = {
   plains: 'W', island: 'U', swamp: 'B', mountain: 'R', forest: 'G',
 };
 
-function inferManaColor(card: Card): keyof ManaPool {
+function inferManaColors(card: Card): (keyof ManaPool)[] {
   const tl = card.type_line.toLowerCase();
-  const nm = card.name.toLowerCase();
-  for (const [basic, color] of Object.entries(BASIC_COLOR_MAP)) {
-    if (tl.includes(basic) || nm.includes(basic)) return color;
-  }
-  return 'C';
+  const colors = Object.entries(BASIC_COLOR_MAP)
+    .filter(([basic]) => tl.includes(basic))
+    .map(([, color]) => color);
+  return colors.length > 0 ? colors : ['C'];
 }
 
 export function emptyManaPool(): ManaPool {
@@ -62,6 +61,38 @@ export function canPayCost(pool: ManaPool, cost: ManaCost): boolean {
   return leftover >= cost.generic;
 }
 
+function chooseProducedColor(gf: GoldfishState, producesColors: (keyof ManaPool)[]): keyof ManaPool {
+  if (producesColors.length <= 1) return producesColors[0] ?? 'C';
+
+  const deficits = new Map<keyof ManaPool, number>();
+  for (const color of producesColors) deficits.set(color, 0);
+
+  for (const card of gf.hand) {
+    if (isLand(card)) continue;
+    const cost = parseMana(card.mana_cost);
+    for (const color of producesColors) {
+      const needed = cost.colors[color] ?? 0;
+      if (needed > 0) {
+        const unmet = Math.max(0, needed - gf.manaPool[color]);
+        deficits.set(color, (deficits.get(color) ?? 0) + unmet);
+      }
+    }
+  }
+
+  let best = producesColors[0];
+  let bestScore = deficits.get(best) ?? 0;
+
+  for (const color of producesColors.slice(1)) {
+    const score = deficits.get(color) ?? 0;
+    if (score > bestScore) {
+      best = color;
+      bestScore = score;
+    }
+  }
+
+  return best;
+}
+
 /* ── State creation ───────────────────────────────────── */
 
 export function createGoldfishState(masterDeck: Card[]): GoldfishState {
@@ -90,28 +121,35 @@ export function tapForMana(gf: GoldfishState, bfIndex: number): GoldfishState {
     i === bfIndex ? { ...p, tapped: true } : p,
   );
   const newPool = { ...gf.manaPool };
-  newPool[perm.producesColor]++;
+  const produced = chooseProducedColor(gf, perm.producesColors);
+  newPool[produced]++;
 
   return {
     ...gf,
     battlefield: newBf,
     manaPool: newPool,
-    log: [...gf.log, `Tapped ${perm.card.name} for {${perm.producesColor}}`],
+    log: [...gf.log, `Tapped ${perm.card.name} for {${produced}}`],
   };
 }
 
 export function tapAll(gf: GoldfishState): GoldfishState {
   const newPool = { ...gf.manaPool };
+  const additions: (keyof ManaPool)[] = [];
   const newBf = gf.battlefield.map(p => {
     if (p.tapped) return p;
-    newPool[p.producesColor]++;
+    const produced = chooseProducedColor({ ...gf, manaPool: newPool }, p.producesColors);
+    newPool[produced]++;
+    additions.push(produced);
     return { ...p, tapped: true };
   });
   return {
     ...gf,
     battlefield: newBf,
     manaPool: newPool,
-    log: [...gf.log, `Tapped all lands (${totalMana(newPool)} mana available)`],
+    log: [
+      ...gf.log,
+      `Tapped all lands (${totalMana(newPool)} mana available${additions.length ? `: ${additions.join(', ')}` : ''})`,
+    ],
   };
 }
 
@@ -124,7 +162,7 @@ export function playLand(gf: GoldfishState, handIndex: number): GoldfishState {
   const perm: Permanent = {
     card,
     tapped: false,
-    producesColor: inferManaColor(card),
+    producesColors: inferManaColors(card),
   };
 
   return {

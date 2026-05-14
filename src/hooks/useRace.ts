@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import type { Card, DeckTrialResult } from '@/types/card';
 import { parseDecklist } from '@/lib/parser';
 import { fetchCards } from '@/lib/scryfall';
@@ -29,7 +29,7 @@ export interface RaceState {
 async function loadOneDeck(
   raw: string,
   label: string,
-): Promise<{ deck: Card[]; degraded: boolean }> {
+): Promise<{ deck: Card[]; degraded: boolean; notFound: string[] }> {
   const { cardMap, errors } = parseDecklist(raw);
   if (cardMap.size === 0) throw new Error(`${label}: No valid cards found.`);
   if (errors.length > 0) throw new Error(`${label}: Unrecognized lines:\n${errors.join('\n')}`);
@@ -51,8 +51,8 @@ async function loadOneDeck(
     }
   }
 
-  const { deck } = buildDeck(cardMap, cardData);
-  return { deck, degraded };
+  const { deck, notFound } = buildDeck(cardMap, cardData);
+  return { deck, degraded, notFound };
 }
 
 export function useRace() {
@@ -86,9 +86,9 @@ export function useRace() {
     setPartial({ loading: true, error: null, status: 'Loading Deck A…', statusTone: '' });
 
     try {
-      const { deck: dA, degraded: degA } = await loadOneDeck(state.textA, 'Deck A');
+      const { deck: dA, degraded: degA, notFound: missingA } = await loadOneDeck(state.textA, 'Deck A');
       setPartial({ status: 'Loading Deck B…' });
-      const { deck: dB, degraded: degB } = await loadOneDeck(state.textB, 'Deck B');
+      const { deck: dB, degraded: degB, notFound: missingB } = await loadOneDeck(state.textB, 'Deck B');
 
       setPartial({ status: 'Running 20 simulated openers per deck…' });
 
@@ -101,8 +101,13 @@ export function useRace() {
       const handA = draw(dsA, 7);
       const handB = draw(dsB, 7);
 
-      const statusTone = degA || degB ? ('warn' as const) : ('' as const);
-      const status = degA || degB ? 'Some card images unavailable (Scryfall down)' : null;
+      const warnings: string[] = [];
+      if (degA || degB) warnings.push('Some card images unavailable (Scryfall down)');
+      if (missingA.length > 0) warnings.push(`Deck A unresolved cards: ${missingA.join(', ')}`);
+      if (missingB.length > 0) warnings.push(`Deck B unresolved cards: ${missingB.join(', ')}`);
+
+      const statusTone = warnings.length > 0 ? ('warn' as const) : ('' as const);
+      const status = warnings.length > 0 ? warnings.join(' • ') : null;
 
       setPartial({
         deckA: dA,
