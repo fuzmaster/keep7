@@ -112,7 +112,7 @@ export interface ManaCost {
 export interface Permanent {
   card: Card;
   tapped: boolean;
-  producesColor: keyof ManaPool;
+  producesColors: (keyof ManaPool)[];
 }
 
 export interface GoldfishState {
