@@ -1,31 +1,33 @@
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
-  --font-display: "Trebuchet MS", "Avenir Next Condensed", "Segoe UI", sans-serif;
+  --font-display: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
   --font-mono: "Consolas", "Courier New", monospace;
-  --bg-root: #08110f;
-  --bg-surface: rgba(16, 28, 24, 0.92);
-  --bg-card: #16231f;
-  --bg-input: #0d1815;
-  --bg-elevated: #1d2d28;
+  --bg-root: #121212;
+  --bg-surface: #181818;
+  --bg-card: #202020;
+  --bg-input: #fff8e7;
+  --bg-elevated: #242424;
 
-  --text-primary: #f2f1e7;
-  --text-secondary: #c7c1a5;
-  --text-muted: #8f947e;
+  --text-primary: #ffffff;
+  --text-secondary: #d7d7d7;
+  --text-muted: #a7a7a7;
 
-  --keep: #73d892;
-  --keep-dim: rgba(115, 216, 146, 0.16);
-  --mull: #e16757;
-  --mull-dim: rgba(225, 103, 87, 0.16);
-  --gold: #dfb657;
-  --gold-dim: rgba(223, 182, 87, 0.18);
-  --purple: #8b79ff;
+  --keep: #1db954;
+  --keep-dim: rgba(29, 185, 84, 0.16);
+  --mull: #ef6c4a;
+  --mull-dim: rgba(239, 108, 74, 0.16);
+  --gold: #ffd23f;
+  --gold-dim: rgba(255, 210, 63, 0.16);
+  --purple: #5dade2;
 
-  --border-faint: rgba(196, 170, 111, 0.14);
-  --border-subtle: rgba(196, 170, 111, 0.24);
-  --border-mid: rgba(223, 182, 87, 0.42);
-  --border-focus: #dfb657;
-  --shadow-card: 0 14px 30px rgba(0, 0, 0, 0.28);
-  --shadow-panel: 0 20px 48px rgba(0, 0, 0, 0.34);
+  --border-faint: #282828;
+  --border-subtle: #343434;
+  --border-mid: #4a4a4a;
+  --border-focus: #ffd23f;
+  --shadow-card: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --shadow-panel: 0 16px 40px rgba(0, 0, 0, 0.34);
+  --glow-keep: 0 0 0 1px rgba(29, 185, 84, 0.35), 0 0 18px rgba(29, 185, 84, 0.18);
+  --glow-gold: 0 0 0 1px rgba(255, 210, 63, 0.38), 0 0 18px rgba(255, 210, 63, 0.18);
 }
 
 /* ── Reset ────────────────────────────────────────────── */
@@ -44,8 +46,8 @@ body {
   font-family: var(--font-display), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-root);
   background-image:
-    radial-gradient(circle at top, rgba(115, 216, 146, 0.1), transparent 28%),
-    linear-gradient(180deg, #10201b 0%, #08110f 24%, #08110f 100%);
+    radial-gradient(circle at top, rgba(29, 185, 84, 0.1), transparent 24%),
+    linear-gradient(180deg, #171717 0%, #121212 30%, #121212 100%);
   color: var(--text-primary);
   line-height: 1.5;
   min-height: 100dvh;

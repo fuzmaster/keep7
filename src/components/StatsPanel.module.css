@@ -1,7 +1,7 @@
 .panel {
   padding: 1rem;
-  background: linear-gradient(180deg, rgba(20, 31, 27, 0.95), rgba(13, 21, 18, 0.95));
-  border-radius: 18px;
+  background: var(--bg-surface);
+  border-radius: 20px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-panel);
   margin-top: 0.75rem;
@@ -38,7 +38,7 @@
 }
 
 .chip {
-  background: linear-gradient(180deg, rgba(26, 39, 35, 0.94), rgba(17, 27, 23, 0.94));
+  background: var(--bg-card);
   border-radius: 14px;
   padding: 0.6rem 0.7rem;
   display: flex;
@@ -50,7 +50,7 @@
 .chipLabel {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -72,8 +72,8 @@
 
 /* Race stats */
 .racePanel {
-  background: linear-gradient(180deg, rgba(20, 31, 27, 0.95), rgba(13, 21, 18, 0.95));
-  border-radius: 18px;
+  background: var(--bg-surface);
+  border-radius: 20px;
   border: 1px solid var(--border-subtle);
   padding: 1rem;
   box-shadow: var(--shadow-panel);
@@ -82,7 +82,7 @@
 .raceLabel {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.7rem;

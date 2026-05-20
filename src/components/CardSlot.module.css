@@ -6,7 +6,7 @@
   aspect-ratio: 5 / 7;
   animation: fadeIn 0.22s ease both;
   transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-  border: 1px solid rgba(223, 182, 87, 0.18);
+  border: 1px solid var(--border-faint);
   box-shadow: var(--shadow-card);
 }
 
@@ -24,7 +24,7 @@
 
 .interactive:hover {
   transform: translateY(-4px) scale(1.015);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34);
 }
 
 .interactive:focus-visible {
@@ -34,11 +34,11 @@
 
 /* Highlight states */
 .playable {
-  box-shadow: 0 0 0 2px var(--keep), 0 0 18px rgba(115, 216, 146, 0.35);
+  box-shadow: var(--glow-keep);
 }
 
 .castable {
-  box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(223, 182, 87, 0.34);
+  box-shadow: var(--glow-gold);
 }
 
 .tapped {
@@ -62,7 +62,7 @@
   height: 100%;
   padding: 0.75rem;
   text-align: center;
-  background: linear-gradient(160deg, var(--bg-elevated), var(--bg-card));
+  background: linear-gradient(160deg, #1f1f1f, #181818);
   border: 1px dashed var(--border-mid);
   border-radius: 14px;
 }
