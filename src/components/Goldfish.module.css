@@ -2,7 +2,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 0.85rem;
-  padding-bottom: 2rem;
+  padding-bottom: 6.5rem;
 }
 
 .idle {
@@ -117,6 +117,12 @@
 @media (min-width: 640px) {
   .zoneGrid {
     grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .wrapper {
+    padding-bottom: 2rem;
   }
 }
 
