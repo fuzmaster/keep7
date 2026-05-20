@@ -67,6 +67,10 @@ button {
   touch-action: manipulation;
 }
 
+main {
+  padding-bottom: calc(5.8rem + env(safe-area-inset-bottom, 0px));
+}
+
 /* ── Accessibility ────────────────────────────────────── */
 .sr-only {
   position: absolute;
@@ -90,5 +94,11 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (min-width: 768px) {
+  main {
+    padding-bottom: 0;
   }
 }

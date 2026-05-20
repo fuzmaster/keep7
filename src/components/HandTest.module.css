@@ -57,7 +57,7 @@
 /* Test layout: single-column mobile → two-column desktop */
 .testLayout {
   padding: 0.5rem;
-  padding-bottom: 5rem; /* space for action bar */
+  padding-bottom: 10.5rem; /* space for action bar + mobile nav */
 }
 
 .sidebar {

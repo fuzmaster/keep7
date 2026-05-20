@@ -1,6 +1,6 @@
 .bar {
   position: fixed;
-  bottom: 0;
+  bottom: calc(5.35rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   display: flex;
@@ -81,6 +81,7 @@
 @media (min-width: 1024px) {
   .bar {
     position: sticky;
+    bottom: auto;
     border-radius: 20px;
     margin-top: 0.75rem;
     border: 1px solid var(--border-subtle);
