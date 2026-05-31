@@ -41,7 +41,7 @@
   font-family: var(--font-mono), 'Fira Code', monospace;
   font-size: 0.95rem;
   line-height: 1.65;
-  color: #172019;
+  color: var(--text-primary);
   resize: vertical;
   min-height: 164px;
 }
