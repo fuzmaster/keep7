@@ -16,13 +16,17 @@ export function Goldfish() {
   if (!gf.started || !gf.gf) {
     return (
       <div className={styles.idle}>
-        <p className={styles.idleText}>Load a deck in Hand Test first, then come here to goldfish.</p>
-        <button className={styles.btn} onClick={() => setMode('handtest')}>
-          Go to Hand Test
-        </button>
-        {masterDeck.length > 0 && (
+        <div className={styles.idleTitle}>Goldfish Mode</div>
+        <p className={styles.idleText}>
+          Play out your deck for turns 1–5 against no opposition. Tap lands for mana, cast your spells, and see how consistently your deck develops.
+        </p>
+        {masterDeck.length > 0 ? (
           <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => gf.start(masterDeck)}>
             Start Goldfish
+          </button>
+        ) : (
+          <button className={styles.btn} onClick={() => setMode('handtest')}>
+            Load a deck in Hand Test first →
           </button>
         )}
       </div>

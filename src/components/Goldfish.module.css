@@ -14,10 +14,17 @@
   text-align: center;
 }
 
+.idleTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 .idleText {
-  color: var(--text-muted);
-  font-size: 1rem;
-  max-width: 360px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  max-width: 380px;
+  line-height: 1.55;
 }
 
 /* Header bar */
@@ -110,13 +117,21 @@
 
 .zoneGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
 }
 
 @media (min-width: 640px) {
   .zoneGrid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .zoneGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
   }
 }
 

@@ -93,7 +93,7 @@ export function useHandTest(onDeckReady?: (deck: Card[]) => void) {
       return;
     }
 
-    setPartial({ loading: true, error: null, warnings: [], statusMessage: null });
+    setPartial({ loading: true, error: null, warnings: [], statusMessage: 'Parsing decklist…', statusTone: 'info' });
 
     const { cardMap, errors } = parseDecklist(text);
     const deckSize = [...cardMap.values()].reduce((a, b) => a + b, 0);
@@ -127,7 +127,9 @@ export function useHandTest(onDeckReady?: (deck: Card[]) => void) {
       cardData = cached;
     } else {
       try {
-        cardData = await fetchCards([...cardMap.keys()]);
+        cardData = await fetchCards([...cardMap.keys()], (loaded, total) => {
+          setPartial({ statusMessage: `Fetching cards… ${loaded}/${total}`, statusTone: 'info' });
+        });
         saveCardCacheByHash(hash, cardData);
       } catch {
         cardData = [];
@@ -137,11 +139,18 @@ export function useHandTest(onDeckReady?: (deck: Card[]) => void) {
 
     const { deck, notFound } = buildDeck(cardMap, cardData);
     const warnings: string[] = [];
-    if (usedFallback) warnings.push('Scryfall unavailable — using placeholder cards.');
-    if (notFound.length > 0) warnings.push(`Not found: ${notFound.join(', ')}`);
+    if (usedFallback) {
+      warnings.push('Scryfall unreachable — placeholder cards in use. All simulation mechanics still work.');
+    } else if (notFound.length > 0) {
+      const preview = notFound.slice(0, 3).join(', ');
+      const tail = notFound.length > 3 ? ` +${notFound.length - 3} more` : '';
+      warnings.push(`${notFound.length} card(s) not found on Scryfall: ${preview}${tail}`);
+    }
 
     samplesRef.current = [];
-    const statusMessage = usedFallback ? 'Running in offline mode — card images unavailable' : null;
+    const statusMessage = usedFallback
+      ? 'Offline mode — card images unavailable. All simulation mechanics still work.'
+      : null;
 
     setPartial({
       masterDeck: deck,
@@ -152,7 +161,7 @@ export function useHandTest(onDeckReady?: (deck: Card[]) => void) {
       warnings,
       usedFallback,
       statusMessage,
-      statusTone: usedFallback ? 'warn' : 'ok',
+      statusTone: usedFallback ? 'warn' : '',
     });
 
     onDeckReady?.(deck);

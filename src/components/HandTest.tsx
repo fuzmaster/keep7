@@ -27,21 +27,38 @@ export function HandTest() {
     <div className={styles.wrapper}>
       {state.view === 'input' ? (
         <div className={styles.inputPanel}>
-          {state.statusMessage && (
-            <div className={`${styles.statusBanner} ${styles[`tone_${state.statusTone}`] ?? ''}`}>
-              {state.statusMessage}
+          <div className={styles.inputPanelMain}>
+            {state.statusMessage && (
+              <div className={`${styles.statusBanner} ${styles[`tone_${state.statusTone}`] ?? ''}`}>
+                {state.statusMessage}
+              </div>
+            )}
+            <DeckInput
+              value={state.deckText}
+              onChange={setDeckText}
+              onSubmit={handleStart}
+              onLoadDemo={loadDemo}
+              loading={state.loading}
+              error={state.error}
+            />
+          </div>
+          <aside className={styles.inputPanelSidebar} aria-hidden="true">
+            <div className={styles.featureList}>
+              <p className={styles.featureHeading}>What you can test</p>
+              <div className={styles.feature}>
+                <div className={styles.featureName}>Hand Test</div>
+                <div className={styles.featureDesc}>Shuffle and evaluate opening 7-card hands. Track keep rate, land distribution, and see your next 3 draws after you keep.</div>
+              </div>
+              <div className={styles.feature}>
+                <div className={styles.featureName}>Goldfish</div>
+                <div className={styles.featureDesc}>Play out turns 1–5 against an empty board. Tap lands for mana, cast spells, and see how your curve develops in practice.</div>
+              </div>
+              <div className={styles.feature}>
+                <div className={styles.featureName}>Deck Race</div>
+                <div className={styles.featureDesc}>Compare two decklists side by side across 20 simulated openers. Get keep rate, land stats, and a plain-English verdict.</div>
+              </div>
             </div>
-          )}
-          <DeckInput
-            value={state.deckText}
-            onChange={setDeckText}
-            onSubmit={handleStart}
-            loading={state.loading}
-            error={state.error}
-          />
-          <button className={styles.demoBtn} onClick={loadDemo}>
-            Load Demo Deck
-          </button>
+          </aside>
         </div>
       ) : (
         <div className={styles.testLayout}>

@@ -45,19 +45,27 @@
 .btnMull {
   background: linear-gradient(180deg, #ff8a6a, #ef6c4a);
   color: #fff;
-  border-color: rgba(239, 108, 74, 0.28);
+  box-shadow: var(--glow-mull);
+}
+
+.btnMull:hover {
+  box-shadow: 0 0 20px rgba(224, 60, 60, 0.45);
 }
 
 .btnKeep {
-  background: linear-gradient(180deg, #3cc4bd, #2ba8a2);
-  color: #07110d;
-  border-color: rgba(60, 196, 189, 0.26);
+  background: var(--keep);
+  color: #07090f;
+  box-shadow: var(--glow-keep);
+}
+
+.btnKeep:hover {
+  box-shadow: 0 0 20px rgba(0, 200, 119, 0.45);
 }
 
 .btnNew {
-  background: linear-gradient(180deg, #ffe47a, #ffd23f);
-  color: #11120d;
-  border-color: rgba(255, 210, 63, 0.34);
+  background: var(--gold);
+  color: #07090f;
+  box-shadow: var(--glow-gold);
 }
 
 .btnReset {
