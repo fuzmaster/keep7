@@ -16,8 +16,8 @@ export function evalHand(hand: Card[]): HandEval {
   let keep: KeepVerdict;
   if (landCount >= 6) keep = 'flood';
   else if (landCount <= 1) keep = 'screw';
-  else if (landCount >= 2 && landCount <= 5 && spellCount >= 1) keep = 'keepable';
   else if (landCount === 2 && spellCount >= 5) keep = 'marginal';
+  else if (landCount >= 2 && landCount <= 5 && spellCount >= 1) keep = 'keepable';
   else keep = 'risky';
 
   return { landCount, spellCount, earlySpells, keep };

@@ -31,26 +31,43 @@ export function Header() {
   }, [mode, setMode]);
 
   return (
-    <header className={styles.header}>
-      <div className={styles.logo}>
-        Keep<span className={styles.seven}>7</span>
-      </div>
-      <nav className={styles.tabs} role="tablist" aria-label="App modes" onKeyDown={onKeyDown}>
-        {TABS.map((tab, i) => (
+    <>
+      <header className={styles.header}>
+        <div className={styles.logo}>
+          Keep<span className={styles.seven}>7</span>
+        </div>
+        <nav className={styles.tabs} role="tablist" aria-label="App modes" onKeyDown={onKeyDown}>
+          {TABS.map((tab, i) => (
+            <button
+              key={tab.mode}
+              id={`tab-${tab.mode}`}
+              ref={el => { tabRefs.current[i] = el; }}
+              role="tab"
+              aria-selected={mode === tab.mode}
+              aria-controls={`panel-${tab.mode}`}
+              tabIndex={mode === tab.mode ? 0 : -1}
+              className={`${styles.tab} ${mode === tab.mode ? styles.active : ''}`}
+              onClick={() => setMode(tab.mode)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <nav className={styles.mobileNav} aria-label="Primary">
+        {TABS.map((tab) => (
           <button
             key={tab.mode}
-            ref={el => { tabRefs.current[i] = el; }}
-            role="tab"
-            aria-selected={mode === tab.mode}
-            aria-controls={`panel-${tab.mode}`}
-            tabIndex={mode === tab.mode ? 0 : -1}
-            className={`${styles.tab} ${mode === tab.mode ? styles.active : ''}`}
+            type="button"
+            aria-current={mode === tab.mode ? 'page' : undefined}
+            className={`${styles.mobileTab} ${mode === tab.mode ? styles.mobileActive : ''}`}
             onClick={() => setMode(tab.mode)}
           >
             {tab.label}
           </button>
         ))}
       </nav>
-    </header>
+    </>
   );
 }

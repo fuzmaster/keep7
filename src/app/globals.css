@@ -40,9 +40,13 @@
   --glow-gold: 0 0 14px rgba(201, 168, 76, 0.22), 0 0 4px rgba(201, 168, 76, 0.12);
   --glow-keep: 0 0 12px rgba(0, 200, 119, 0.25);
   --glow-mull: 0 0 12px rgba(224, 60, 60, 0.25);
+  --shadow-card: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --shadow-panel: 0 16px 40px rgba(0, 0, 0, 0.34);
+  --purple: #5dade2;
 
   /* Display font — Cinzel (Beleren-adjacent serif for logo/headings) */
   --font-display: 'Cinzel', serif;
+  --font-mono: "Consolas", "Courier New", monospace;
 }
 
 /* ── Reset ────────────────────────────────────────────── */
@@ -58,18 +62,17 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-root);
+  background-image:
+    radial-gradient(circle at top, rgba(29, 185, 84, 0.1), transparent 24%),
+    linear-gradient(180deg, #171717 0%, #121212 30%, #121212 100%);
   color: var(--text-primary);
   line-height: 1.5;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-}
-
-main {
-  flex: 1;
+  font-size: 16px;
 }
 
 img {
@@ -79,6 +82,15 @@ img {
 
 button, input, select, textarea {
   font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+main {
+  flex: 1;
+  padding-bottom: calc(5.8rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* ── Accessibility ────────────────────────────────────── */
@@ -104,5 +116,11 @@ button, input, select, textarea {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (min-width: 768px) {
+  main {
+    padding-bottom: 0;
   }
 }

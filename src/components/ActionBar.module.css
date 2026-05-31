@@ -1,31 +1,36 @@
 .bar {
   position: fixed;
-  bottom: 0;
+  bottom: calc(5.35rem + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   display: flex;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-faint);
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  padding-bottom: calc(0.8rem + env(safe-area-inset-bottom, 0px));
+  background: rgba(18, 18, 18, 0.96);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.3);
   z-index: 90;
   align-items: center;
+  backdrop-filter: blur(12px);
 }
 
 .btn {
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  flex: 1 1 132px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  font-size: 0.98rem;
+  font-weight: 700;
   cursor: pointer;
-  min-height: 42px;
-  transition: opacity 0.12s, transform 0.12s;
+  min-height: 54px;
+  transition: opacity 0.12s, transform 0.12s, box-shadow 0.12s;
+  box-shadow: var(--shadow-card);
 }
 
 .btn:hover {
-  opacity: 0.85;
+  opacity: 0.94;
 }
 
 .btn:active {
@@ -38,7 +43,7 @@
 }
 
 .btnMull {
-  background: var(--mull);
+  background: linear-gradient(180deg, #ff8a6a, #ef6c4a);
   color: #fff;
   box-shadow: var(--glow-mull);
 }
@@ -65,13 +70,18 @@
 
 .btnReset {
   background: var(--bg-elevated);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   border: 1px solid var(--border-subtle);
-  margin-left: auto;
+  flex-basis: 100%;
 }
 
 .counter {
-  font-size: 0.75rem;
+  width: 100%;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -79,8 +89,19 @@
 @media (min-width: 1024px) {
   .bar {
     position: sticky;
-    border-radius: 10px;
+    bottom: auto;
+    border-radius: 20px;
     margin-top: 0.75rem;
-    border: 1px solid var(--border-faint);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .btnReset {
+    flex: 0 1 auto;
+    margin-left: auto;
+  }
+
+  .counter {
+    width: auto;
   }
 }

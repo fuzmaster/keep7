@@ -17,10 +17,10 @@
 }
 
 .statusBanner {
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
   margin-bottom: 1rem;
   border: 1px solid var(--border-subtle);
 }
@@ -103,7 +103,7 @@
 /* Test layout: single-column mobile → two-column desktop */
 .testLayout {
   padding: 0.5rem;
-  padding-bottom: 5rem; /* space for action bar */
+  padding-bottom: 10.5rem; /* space for action bar + mobile nav */
 }
 
 .sidebar {
@@ -115,12 +115,12 @@
 }
 
 .sectionTitle {
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.375rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
 }
 
 .degraded {

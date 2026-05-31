@@ -19,8 +19,8 @@ export async function importFromUrl(url: string): Promise<ImportedDeck> {
 
   const res = await fetch(`/api/import/${detected.source}?id=${encodeURIComponent(detected.id)}`);
   if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(body || `Failed to import from ${detected.source} (${res.status})`);
+    const body = await res.json().catch(async () => ({ error: await res.text().catch(() => '') }));
+    throw new Error(body.error || `Failed to import from ${detected.source} (${res.status})`);
   }
 
   return (await res.json()) as ImportedDeck;
