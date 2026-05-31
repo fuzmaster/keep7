@@ -16,24 +16,23 @@
 }
 
 .privacy {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   max-width: 480px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .links {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.5rem;
   flex-shrink: 0;
 }
 
 .link {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: color 0.15s;
-  letter-spacing: 0.02em;
 }
 
 .link:hover {

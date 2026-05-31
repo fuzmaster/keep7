@@ -7,10 +7,10 @@
   --bg-input: #0a0e1c;
   --bg-elevated: #161e30;
 
-  /* Text */
-  --text-primary: #eceef8;
-  --text-secondary: #8892b8;
-  --text-muted: #505878;
+  /* Text — bumped for sustained-reading contrast on dark bg */
+  --text-primary: #f1f3fb;
+  --text-secondary: #a8b0ce;
+  --text-muted: #7b83a3;
 
   /* Semantic: green = keep, red = mull — matches MTG color philosophy */
   --keep: #00c877;
@@ -62,17 +62,19 @@ html {
 }
 
 body {
-  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: var(--bg-root);
   background-image:
-    radial-gradient(circle at top, rgba(29, 185, 84, 0.1), transparent 24%),
-    linear-gradient(180deg, #171717 0%, #121212 30%, #121212 100%);
+    radial-gradient(circle at top, rgba(201, 168, 76, 0.06), transparent 28%),
+    linear-gradient(180deg, #0a0e1c 0%, #07090f 30%, #07090f 100%);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img {

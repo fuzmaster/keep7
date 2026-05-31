@@ -46,7 +46,7 @@
   font-family: var(--font-mono), 'Fira Code', monospace;
   font-size: 0.95rem;
   line-height: 1.65;
-  color: #172019;
+  color: var(--text-primary);
   resize: vertical;
   min-height: 164px;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -59,7 +59,7 @@
 }
 
 .textarea::placeholder {
-  color: #7d7a73;
+  color: var(--text-muted);
 }
 
 .hint {
@@ -182,7 +182,7 @@
   border-radius: 999px;
   padding: 0.8rem 0.9rem;
   font-size: 0.95rem;
-  color: #172019;
+  color: var(--text-primary);
   min-height: 52px;
   cursor: pointer;
 }
