@@ -84,12 +84,12 @@ export async function fetchCards(
   const results: Card[] = [];
   let loaded = 0;
 
-  for (const chunk of chunks) {
+  for (const [index, chunk] of chunks.entries()) {
     const res = await fetchChunk(chunk);
     results.push(...res.data.map(stripCard));
     loaded += chunk.length;
     onProgress?.(loaded, unique.length);
-    if (chunks.indexOf(chunk) < chunks.length - 1) await delay(THROTTLE_MS);
+    if (index < chunks.length - 1) await delay(THROTTLE_MS);
   }
 
   return results;
